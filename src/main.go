@@ -526,14 +526,18 @@ body {
     border-bottom: 1px solid #4f5374;
 }
 .back-link { 
-    color: #8be9fd; 
+    color: #1e1f29;
+    background: #8be9fd;
     text-decoration: none; 
     margin-right: 20px; 
+    padding: 8px 16px;
+    border-radius: 6px;
     font-weight: 500;
-    transition: color 0.2s;
+    transition: all 0.2s;
 }
 .back-link:hover { 
-    color: #50fa7b;
+    background: #50fa7b;
+    transform: translateY(-1px);
 }
 h1 { 
     color: #bd93f9; 
