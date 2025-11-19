@@ -17,6 +17,11 @@ import (
 
 type Config struct {
 	Port     int `yaml:"port"`
+	Auth     struct {
+		Enabled  bool   `yaml:"enabled"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	} `yaml:"auth"`
 	LogFiles []struct {
 		Path string `yaml:"path"`
 		Name string `yaml:"name"`
@@ -125,6 +130,38 @@ func (ls *LogStreamer) Start() {
 
 var streamers = make(map[string]*LogStreamer)
 var config Config
+
+func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !config.Auth.Enabled {
+			handler(w, r)
+			return
+		}
+		
+		username, password, ok := r.BasicAuth()
+		if !ok || username != config.Auth.Username || password != config.Auth.Password {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintf(w, `
+<!DOCTYPE html>
+<html>
+<head><title>Authentication Required</title>
+<style>
+body { font-family: Arial, sans-serif; background: #1e1e1e; color: #fff; text-align: center; padding: 50px; }
+h1 { color: #2196F3; }
+</style>
+</head>
+<body>
+<h1>Authentication Required</h1>
+<p>Please provide valid credentials to access the log viewer.</p>
+</body>
+</html>`)
+			return
+		}
+		
+		handler(w, r)
+	}
+}
 
 func loadConfig() error {
 	data, err := os.ReadFile("config.yml")
@@ -581,7 +618,7 @@ function loadMore() {
 }
 
 function updateLogInfo() {
-    logInfo.textContent = `Showing ${shownLines} of ${totalLines} lines`;
+    logInfo.textContent = 'Showing ' + shownLines + ' of ' + totalLines + ' lines';
     loadMoreBtn.style.display = shownLines >= totalLines ? 'none' : 'inline-block';
 }
 </script>
@@ -661,11 +698,16 @@ func handleLoadMore(w http.ResponseWriter, r *http.Request) {
 		fmt.Sscanf(*port, "%d", &config.Port)
 	}
 
-	http.HandleFunc("/", handleIndex)
-	http.HandleFunc("/ws", handleWebSocket)
-	http.HandleFunc("/api/loadmore", handleLoadMore)
+	http.HandleFunc("/", requireAuth(handleIndex))
+	http.HandleFunc("/ws", requireAuth(handleWebSocket))
+	http.HandleFunc("/api/loadmore", requireAuth(handleLoadMore))
 
 	fmt.Printf("Loged server starting on port %d\n", config.Port)
+	if config.Auth.Enabled {
+		fmt.Printf("Authentication enabled - Username: %s\n", config.Auth.Username)
+	} else {
+		fmt.Printf("Authentication disabled\n")
+	}
 	fmt.Printf("Open http://localhost:%d in your browser\n", config.Port)
 	
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil))

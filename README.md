@@ -74,11 +74,15 @@ git clone https://github.com/rutwikdeshmukh/loged.git && cd loged && ./loged
 
 ### Configuration
 
-Edit `config.yml` to customize log files and port:
+Edit `config.yml` to customize log files, port, and authentication:
 
 ```yaml
 # Configuration file for the log monitoring application
 port: 8008
+auth:
+  enabled: true
+  username: "admin"
+  password: "loged123"
 log_files:
   - name: "Sample Log"
     path: "./sample.log"
@@ -89,6 +93,13 @@ log_files:
   - name: "Application Log"
     path: "./app.log"
 ```
+
+**Authentication Options:**
+- `enabled: true/false` - Enable or disable basic authentication
+- `username` - Username for accessing the log viewer
+- `password` - Password for accessing the log viewer
+
+**Security Note:** Change the default credentials before deploying to production.
 
 ### Accessing the Interface
 

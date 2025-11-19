@@ -126,6 +126,16 @@ case "$1" in
         fi
         ;;
     
+    update)
+        echo "🔄 Updating Loged..."
+        $0 stop
+        sleep 1
+        install_and_build
+        echo ""
+        echo "🚀 Starting updated server..."
+        $0 start
+        ;;
+    
     ""|install)
         install_and_build
         echo ""
@@ -135,13 +145,14 @@ case "$1" in
         ;;
     
     *)
-        echo "Usage: loged {start|stop|status|install}"
+        echo "Usage: loged {start|stop|status|install|update}"
         echo ""
         echo "Commands:"
         echo "  start   - Start Loged server in background"
         echo "  stop    - Stop Loged server"
         echo "  status  - Check if Loged is running"
         echo "  install - Install dependencies and build"
+        echo "  update  - Stop, rebuild, and restart server"
         exit 1
         ;;
 esac
