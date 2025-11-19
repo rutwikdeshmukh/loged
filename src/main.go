@@ -330,7 +330,12 @@ h1 {
 
 <script>
 function proceedToApp() {
-    window.location.href = '%s/app';
+    // Redirect to HTTPS for secure log viewer
+    const protocol = 'https:';
+    const host = window.location.host;
+    const basePath = '%s';
+    const appPath = basePath ? basePath + '/app' : '/app';
+    window.location.href = protocol + '//' + host + appPath;
 }
 </script>
 </body>
