@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src/logo.png" alt="Catlog Logo" width="120" height="120">
+  <img src="src/catlog.png" alt="Catlog Logo" width="120" height="120">
 </div>
 
 # catlog

@@ -164,6 +164,14 @@ install_and_build() {
 
 case "$1" in
     start)
+        # Check if config.yml exists
+        if [ ! -f "config.yml" ]; then
+            echo "❌ Error: config.yml not found"
+            echo "📝 Please copy example.config.yml to config.yml and configure it"
+            echo "   cp example.config.yml config.yml"
+            exit 1
+        fi
+        
         # Build if binary doesn't exist
         if [ ! -f "$BINARY" ]; then
             install_and_build
@@ -243,6 +251,14 @@ case "$1" in
         ;;
     
     restart)
+        # Check if config.yml exists
+        if [ ! -f "config.yml" ]; then
+            echo "❌ Error: config.yml not found"
+            echo "📝 Please copy example.config.yml to config.yml and configure it"
+            echo "   cp example.config.yml config.yml"
+            exit 1
+        fi
+        
         echo "🔄 Restarting Catlog with IP detection..."
         
         # Stop current service
