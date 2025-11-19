@@ -239,6 +239,12 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	logPath := r.URL.Query().Get("file")
 	log.Printf("HTTP request for path: %s, file param: %s", r.URL.Path, logPath)
 	
+	// Get base path for URLs (detect if behind reverse proxy)
+	basePath := ""
+	if r.Header.Get("X-Forwarded-For") != "" {
+		basePath = "/loaded"
+	}
+	
 	if logPath == "" {
 		// Show available log files from config
 		w.Header().Set("Content-Type", "text/html")
@@ -352,7 +358,7 @@ h1 {
 		hasFiles := false
 		for _, logFile := range config.LogFiles {
 			if _, err := os.Stat(logFile.Path); err == nil {
-				fmt.Fprintf(w, `<div class="log-item"><a href="?file=%s">%s</a><small>%s</small></div>`, logFile.Path, logFile.Name, logFile.Path)
+				fmt.Fprintf(w, `<div class="log-item"><a href="%s?file=%s">%s</a><small>%s</small></div>`, basePath, logFile.Path, logFile.Name, logFile.Path)
 				hasFiles = true
 			}
 		}
@@ -364,14 +370,14 @@ h1 {
 		fmt.Fprintf(w, `</div>
 <div class="section">
 <h3>Custom Log File</h3>
-<form class="custom-form">
+<form class="custom-form" action="%s">
 <input type="text" name="file" placeholder="/path/to/your/log/file" required>
 <button type="submit">View Log</button>
 </form>
 </div>
 </div>
 </body>
-</html>`)
+</html>`, basePath)
 		return
 	}
 
@@ -496,7 +502,7 @@ h1 {
 </head>
 <body>
 <div class="header">
-    <a href="/" class="back-link">Back to Log List</a>
+    <a href="%s" class="back-link">Back to Log List</a>
     <h1>%s</h1>
     <div id="status">Connecting...</div>
 </div>
@@ -509,7 +515,8 @@ h1 {
 </div>
 <script>
 console.log('Connecting to WebSocket...');
-const ws = new WebSocket('ws://'+location.host+'/ws?file=%s');
+const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const ws = new WebSocket(wsProtocol + '//' + location.host + '%s/ws?file=%s');
 const logs = document.getElementById('logs');
 const status = document.getElementById('status');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -588,7 +595,7 @@ function loadMore() {
     loadMoreBtn.textContent = 'Loading...';
     
     // Request more lines from server
-    fetch('/api/loadmore?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
+    fetch('%s/api/loadmore?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
         .then(response => response.json())
         .then(data => {
             const scrollPos = logs.scrollTop;
@@ -623,7 +630,7 @@ function updateLogInfo() {
 }
 </script>
 </body>
-</html>`, filename, filename, logPath)
+</html>`, filename, basePath, filename, basePath, logPath, basePath, logPath)
 }
 
 func handleLoadMore(w http.ResponseWriter, r *http.Request) {

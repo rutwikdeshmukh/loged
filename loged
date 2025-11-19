@@ -15,38 +15,69 @@ install_and_build() {
     # Create runtime directory
     mkdir -p "$RUNTIME_DIR"
 
-    # Check if Go is installed
-    if ! command -v go &> /dev/null; then
-        echo "📦 Installing Go..."
+    # Check what needs to be installed (Linux only - nginx not installed on Windows/macOS)
+    NEED_GO=false
+    NEED_NGINX=false
+    
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if ! command -v go &> /dev/null; then
+            NEED_GO=true
+        fi
+        if ! command -v nginx &> /dev/null; then
+            NEED_NGINX=true
+        fi
         
-        # Detect OS and install Go
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            # Linux
+        # Install packages if needed
+        if [[ "$NEED_GO" == true ]] || [[ "$NEED_NGINX" == true ]]; then
+            echo "📦 Installing packages..."
+            
             if command -v apt-get &> /dev/null; then
                 sudo apt-get update -qq
-                sudo apt-get install -y golang-go
+                if [[ "$NEED_GO" == true ]]; then
+                    sudo apt-get install -y golang-go
+                fi
+                if [[ "$NEED_NGINX" == true ]]; then
+                    sudo apt-get install -y nginx
+                fi
             elif command -v yum &> /dev/null; then
-                sudo yum install -y golang
+                if [[ "$NEED_GO" == true ]]; then
+                    sudo yum install -y golang
+                fi
+                if [[ "$NEED_NGINX" == true ]]; then
+                    sudo yum install -y nginx
+                fi
             elif command -v dnf &> /dev/null; then
-                sudo dnf install -y golang
+                if [[ "$NEED_GO" == true ]]; then
+                    sudo dnf install -y golang
+                fi
+                if [[ "$NEED_NGINX" == true ]]; then
+                    sudo dnf install -y nginx
+                fi
             else
-                echo "❌ Unsupported Linux distribution. Please install Go manually."
+                echo "❌ Unsupported Linux distribution. Please install Go and nginx manually."
                 exit 1
             fi
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if ! command -v go &> /dev/null; then
+            echo "📦 Installing Go..."
             if command -v brew &> /dev/null; then
                 brew install go
             else
                 echo "❌ Please install Homebrew first or install Go manually from https://golang.org/dl/"
                 exit 1
             fi
-        else
+        fi
+    else
+        if ! command -v go &> /dev/null; then
             echo "❌ Unsupported OS. Please install Go manually from https://golang.org/dl/"
             exit 1
         fi
-    else
-        echo "✅ Go is already installed: $(go version)"
+    fi
+
+    if command -v go &> /dev/null; then
+        echo "✅ Go is installed: $(go version)"
     fi
 
     # Install dependencies
@@ -59,6 +90,16 @@ install_and_build() {
 
     # Make it executable
     chmod +x "$BINARY"
+
+    # Setup nginx reverse proxy (Linux only)
+    if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
+        echo "🌐 Setting up nginx reverse proxy..."
+        sudo cp loged-nginx /etc/nginx/sites-available/loged
+        sudo ln -sf /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
+        sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
+        echo "✅ Nginx reverse proxy configured"
+        echo "📍 Access via: http://loged.logs/loaded (add '127.0.0.1 loged.logs' to /etc/hosts)"
+    fi
 
     echo "✅ Loged installed successfully!"
 }
