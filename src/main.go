@@ -242,7 +242,7 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func handleLogo(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "catlog.png")
+	http.ServeFile(w, r, "src/catlog.png")
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
