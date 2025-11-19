@@ -3,6 +3,8 @@ package main
 import (
 	"bufio"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -12,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"gopkg.in/yaml.v3"
@@ -40,8 +43,56 @@ type User struct {
 	AllowedPaths []string
 }
 
+type Session struct {
+	ID        string
+	User      *User
+	CreatedAt time.Time
+}
+
+var sessions = make(map[string]*Session)
+var sessionMutex sync.RWMutex
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
+}
+
+func generateSessionID() string {
+	bytes := make([]byte, 16)
+	rand.Read(bytes)
+	return hex.EncodeToString(bytes)
+}
+
+func createSession(user *User) string {
+	sessionMutex.Lock()
+	defer sessionMutex.Unlock()
+	
+	sessionID := generateSessionID()
+	sessions[sessionID] = &Session{
+		ID:        sessionID,
+		User:      user,
+		CreatedAt: time.Now(),
+	}
+	return sessionID
+}
+
+func getSession(sessionID string) *Session {
+	sessionMutex.RLock()
+	defer sessionMutex.RUnlock()
+	return sessions[sessionID]
+}
+
+func deleteSession(sessionID string) {
+	sessionMutex.Lock()
+	defer sessionMutex.Unlock()
+	delete(sessions, sessionID)
+}
+
+func getSessionFromRequest(r *http.Request) *Session {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		return nil
+	}
+	return getSession(cookie.Value)
 }
 
 func matchPath(pattern, path string) bool {
@@ -68,8 +119,9 @@ func hasAccess(user *User, logPath string) bool {
 }
 
 func getUserFromContext(r *http.Request) *User {
-	if user, ok := r.Context().Value("user").(*User); ok {
-		return user
+	session := getSessionFromRequest(r)
+	if session != nil {
+		return session.User
 	}
 	return nil
 }
@@ -180,35 +232,135 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// Get client IP
+		session := getSessionFromRequest(r)
+		if session == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		handler(w, r)
+	}
+}
+
+func handleLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		// Show login form
+		w.Header().Set("Content-Type", "text/html")
+		fmt.Fprintf(w, `
+<!DOCTYPE html>
+<html>
+<head>
+<title>Loged - Login</title>
+<style>
+* { box-sizing: border-box; }
+body { 
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #1e1f29;
+    color: #f8f8f2;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-container {
+    background: #383a59;
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #4f5374;
+    width: 100%%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+h1 {
+    color: #bd93f9;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8be9fd;
+    font-weight: 500;
+}
+input[type="text"], input[type="password"] {
+    width: 100%%;
+    padding: 12px 16px;
+    background: #1e1f29;
+    border: 1px solid #4f5374;
+    border-radius: 6px;
+    color: #f8f8f2;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
+    border-color: #8be9fd;
+}
+.login-btn {
+    width: 100%%;
+    padding: 12px;
+    background: #50fa7b;
+    color: #1e1f29;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.login-btn:hover {
+    background: #5af78e;
+    transform: translateY(-1px);
+}
+.error {
+    background: #ff5555;
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="login-container">
+    <h1>loged</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="login-btn">Login</button>
+    </form>
+</div>
+</body>
+</html>`)
+		return
+	}
+
+	if r.Method == "POST" {
+		// Handle login submission
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		// Get client IP for logging
 		clientIP := r.Header.Get("X-Real-IP")
 		if clientIP == "" {
 			clientIP = r.Header.Get("X-Forwarded-For")
 		}
 		if clientIP == "" {
 			clientIP = r.RemoteAddr
-		}
-
-		username, password, ok := r.BasicAuth()
-		if !ok {
-			log.Printf("AUTH FAILED: IP=%s, No credentials provided", clientIP)
-			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
-			w.WriteHeader(http.StatusUnauthorized)
-			fmt.Fprintf(w, `
-<!DOCTYPE html>
-<html>
-<head><title>Authentication Required</title>
-<style>
-body { font-family: Arial, sans-serif; background: #1e1e1e; color: #fff; text-align: center; padding: 50px; }
-h1 { color: #2196F3; }
-</style>
-</head>
-<body>
-<h1>Authentication Required</h1>
-<p>Please provide valid credentials to access the log viewer.</p>
-</body>
-</html>`)
-			return
 		}
 
 		// Find user in config
@@ -225,32 +377,153 @@ h1 { color: #2196F3; }
 		}
 
 		if authenticatedUser == nil {
-			log.Printf("AUTH FAILED: IP=%s, Username=%s", clientIP, username)
-			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
-			w.WriteHeader(http.StatusUnauthorized)
+			log.Printf("LOGIN FAILED: IP=%s, Username=%s", clientIP, username)
+			// Show login form with error
+			w.Header().Set("Content-Type", "text/html")
 			fmt.Fprintf(w, `
 <!DOCTYPE html>
 <html>
-<head><title>Authentication Required</title>
+<head>
+<title>Loged - Login</title>
 <style>
-body { font-family: Arial, sans-serif; background: #1e1e1e; color: #fff; text-align: center; padding: 50px; }
-h1 { color: #2196F3; }
+* { box-sizing: border-box; }
+body { 
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #1e1f29;
+    color: #f8f8f2;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-container {
+    background: #383a59;
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #4f5374;
+    width: 100%%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+h1 {
+    color: #bd93f9;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8be9fd;
+    font-weight: 500;
+}
+input[type="text"], input[type="password"] {
+    width: 100%%;
+    padding: 12px 16px;
+    background: #1e1f29;
+    border: 1px solid #4f5374;
+    border-radius: 6px;
+    color: #f8f8f2;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
+    border-color: #8be9fd;
+}
+.login-btn {
+    width: 100%%;
+    padding: 12px;
+    background: #50fa7b;
+    color: #1e1f29;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.login-btn:hover {
+    background: #5af78e;
+    transform: translateY(-1px);
+}
+.error {
+    background: #ff5555;
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    text-align: center;
+}
 </style>
 </head>
 <body>
-<h1>Authentication Required</h1>
-<p>Please provide valid credentials to access the log viewer.</p>
+<div class="login-container">
+    <h1>loged</h1>
+    <div class="error">Invalid username or password</div>
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="%s" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="login-btn">Login</button>
+    </form>
+</div>
 </body>
-</html>`)
+</html>`, username)
 			return
 		}
 
-		log.Printf("AUTH SUCCESS: IP=%s, Username=%s, Role=%s", clientIP, username, authenticatedUser.Role)
+		log.Printf("LOGIN SUCCESS: IP=%s, Username=%s, Role=%s", clientIP, username, authenticatedUser.Role)
 		
-		// Add user to request context
-		ctx := context.WithValue(r.Context(), "user", authenticatedUser)
-		handler(w, r.WithContext(ctx))
+		// Create session
+		sessionID := createSession(authenticatedUser)
+		
+		// Set session cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_id",
+			Value:    sessionID,
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   false, // Set to true if using HTTPS
+			SameSite: http.SameSiteLaxMode,
+		})
+
+		// Redirect to app
+		http.Redirect(w, r, "/app", http.StatusSeeOther)
+		return
 	}
+}
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	// Get session and delete it
+	session := getSessionFromRequest(r)
+	if session != nil {
+		deleteSession(session.ID)
+		log.Printf("LOGOUT: Username=%s", session.User.Username)
+	}
+
+	// Clear session cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_id",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+
+	// Redirect to login
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func loadConfig() error {
@@ -616,16 +889,7 @@ h1 {
 </div>
 <script>
 function logout() {
-    // Clear authentication by making a request with invalid credentials
-    fetch(window.location.href, {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Basic ' + btoa('invalid:invalid')
-        }
-    }).then(() => {
-        // Redirect to trigger new authentication
-        window.location.href = window.location.origin + window.location.pathname.replace('/app', '');
-    });
+    window.location.href = '/logout';
 }
 </script>
 </body>
@@ -944,16 +1208,7 @@ function updateLogInfo() {
 }
 
 function logout() {
-    // Clear authentication by making a request with invalid credentials
-    fetch(window.location.href, {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Basic ' + btoa('invalid:invalid')
-        }
-    }).then(() => {
-        // Redirect to trigger new authentication
-        window.location.href = window.location.origin + window.location.pathname.replace('/app', '');
-    });
+    window.location.href = '/logout';
 }
 </script>
 </body>
@@ -1043,6 +1298,8 @@ func main() {
 	}
 
 	http.HandleFunc("/", handleLanding)
+	http.HandleFunc("/login", handleLogin)
+	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/app", requireAuth(handleIndex))
 	http.HandleFunc("/ws", requireAuth(handleWebSocket))
 	http.HandleFunc("/api/loadmore", requireAuth(handleLoadMore))
