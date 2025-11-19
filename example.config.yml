@@ -7,8 +7,30 @@ ssl:
   key_path: "/etc/ssl/private/loged.key"
 auth:
   enabled: true
-  username: "admin"
-  password: "loged123"
+  users:
+    - username: "admin"
+      password: "loged123"
+      role: "admin"  # admin has access to all logs
+    - username: "BEDeveloper"
+      password: "backend123"
+      role: "backend"
+      allowed_paths:
+        - "/var/log/supervisor/*"
+        - "/var/log/app/*"
+        - "./runtime/loged.log"
+    - username: "FEDeveloper"
+      password: "frontend123"
+      role: "frontend"
+      allowed_paths:
+        - "/var/log/nginx/*"
+        - "/var/log/apache2/*"
+    - username: "DevOps"
+      password: "devops123"
+      role: "devops"
+      allowed_paths:
+        - "/var/log/syslog"
+        - "/var/log/auth.log"
+        - "/var/log/nginx/*"
 log_files:
   - name: "Sample Log"
     path: "./src/sample.log"

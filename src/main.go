@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,8 +10,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"gopkg.in/yaml.v3"
@@ -19,9 +22,13 @@ import (
 type Config struct {
 	Port int `yaml:"port"`
 	Auth struct {
-		Enabled  bool   `yaml:"enabled"`
-		Username string `yaml:"username"`
-		Password string `yaml:"password"`
+		Enabled bool `yaml:"enabled"`
+		Users   []struct {
+			Username     string   `yaml:"username"`
+			Password     string   `yaml:"password"`
+			Role         string   `yaml:"role"`
+			AllowedPaths []string `yaml:"allowed_paths"`
+		} `yaml:"users"`
 	} `yaml:"auth"`
 	LogFiles []struct {
 		Path string `yaml:"path"`
@@ -29,8 +36,44 @@ type Config struct {
 	} `yaml:"log_files"`
 }
 
+type User struct {
+	Username     string
+	Role         string
+	AllowedPaths []string
+}
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
+}
+
+func matchPath(pattern, path string) bool {
+	if pattern == path {
+		return true
+	}
+	if strings.HasSuffix(pattern, "*") {
+		prefix := strings.TrimSuffix(pattern, "*")
+		return strings.HasPrefix(path, prefix)
+	}
+	return false
+}
+
+func hasAccess(user *User, logPath string) bool {
+	if user.Role == "admin" {
+		return true
+	}
+	for _, allowedPath := range user.AllowedPaths {
+		if matchPath(allowedPath, logPath) {
+			return true
+		}
+	}
+	return false
+}
+
+func getUserFromContext(r *http.Request) *User {
+	if user, ok := r.Context().Value("user").(*User); ok {
+		return user
+	}
+	return nil
 }
 
 type LogStreamer struct {
@@ -149,7 +192,41 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 		}
 
 		username, password, ok := r.BasicAuth()
-		if !ok || username != config.Auth.Username || password != config.Auth.Password {
+		if !ok {
+			log.Printf("AUTH FAILED: IP=%s, No credentials provided", clientIP)
+			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintf(w, `
+<!DOCTYPE html>
+<html>
+<head><title>Authentication Required</title>
+<style>
+body { font-family: Arial, sans-serif; background: #1e1e1e; color: #fff; text-align: center; padding: 50px; }
+h1 { color: #2196F3; }
+</style>
+</head>
+<body>
+<h1>Authentication Required</h1>
+<p>Please provide valid credentials to access the log viewer.</p>
+</body>
+</html>`)
+			return
+		}
+
+		// Find user in config
+		var authenticatedUser *User
+		for _, user := range config.Auth.Users {
+			if user.Username == username && user.Password == password {
+				authenticatedUser = &User{
+					Username:     user.Username,
+					Role:         user.Role,
+					AllowedPaths: user.AllowedPaths,
+				}
+				break
+			}
+		}
+
+		if authenticatedUser == nil {
 			log.Printf("AUTH FAILED: IP=%s, Username=%s", clientIP, username)
 			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
 			w.WriteHeader(http.StatusUnauthorized)
@@ -170,8 +247,11 @@ h1 { color: #2196F3; }
 			return
 		}
 
-		log.Printf("AUTH SUCCESS: IP=%s, Username=%s", clientIP, username)
-		handler(w, r)
+		log.Printf("AUTH SUCCESS: IP=%s, Username=%s, Role=%s", clientIP, username, authenticatedUser.Role)
+		
+		// Add user to request context
+		ctx := context.WithValue(r.Context(), "user", authenticatedUser)
+		handler(w, r.WithContext(ctx))
 	}
 }
 
@@ -187,6 +267,14 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	logPath := r.URL.Query().Get("file")
 	if logPath == "" {
 		http.Error(w, "file parameter required", http.StatusBadRequest)
+		return
+	}
+
+	// Check user access permissions
+	user := getUserFromContext(r)
+	if user != nil && !hasAccess(user, logPath) {
+		log.Printf("ACCESS DENIED: User=%s, Role=%s, Path=%s", user.Username, user.Role, logPath)
+		http.Error(w, "Access denied to this log file", http.StatusForbidden)
 		return
 	}
 
@@ -482,10 +570,14 @@ h1 {
 <h3>Available Log Files</h3>`)
 
 		hasFiles := false
+		user := getUserFromContext(r)
 		for _, logFile := range config.LogFiles {
 			if _, err := os.Stat(logFile.Path); err == nil {
-				fmt.Fprintf(w, `<div class="log-item"><a href="%s?file=%s">%s</a><small>%s</small></div>`, basePath, logFile.Path, logFile.Name, logFile.Path)
-				hasFiles = true
+				// Check if user has access to this log file
+				if user == nil || hasAccess(user, logFile.Path) {
+					fmt.Fprintf(w, `<div class="log-item"><a href="%s?file=%s">%s</a><small>%s</small></div>`, basePath, logFile.Path, logFile.Name, logFile.Path)
+					hasFiles = true
+				}
 			}
 		}
 
@@ -504,6 +596,14 @@ h1 {
 </div>
 </body>
 </html>`, basePath)
+		return
+	}
+
+	// Check user access permissions
+	user := getUserFromContext(r)
+	if user != nil && !hasAccess(user, logPath) {
+		log.Printf("ACCESS DENIED: User=%s, Role=%s, Path=%s", user.Username, user.Role, logPath)
+		http.Error(w, "Access denied to this log file", http.StatusForbidden)
 		return
 	}
 
@@ -799,6 +899,14 @@ func handleLoadMore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check user access permissions
+	user := getUserFromContext(r)
+	if user != nil && !hasAccess(user, logPath) {
+		log.Printf("ACCESS DENIED: User=%s, Role=%s, Path=%s", user.Username, user.Role, logPath)
+		http.Error(w, "Access denied to this log file", http.StatusForbidden)
+		return
+	}
+
 	offset := 0
 	limit := 100
 
@@ -870,7 +978,10 @@ func main() {
 
 	fmt.Printf("Loged server starting on port %d\n", config.Port)
 	if config.Auth.Enabled {
-		fmt.Printf("Authentication enabled - Username: %s\n", config.Auth.Username)
+		fmt.Printf("Authentication enabled - %d users configured\n", len(config.Auth.Users))
+		for _, user := range config.Auth.Users {
+			fmt.Printf("  - %s (%s)\n", user.Username, user.Role)
+		}
 	} else {
 		fmt.Printf("Authentication disabled\n")
 	}
