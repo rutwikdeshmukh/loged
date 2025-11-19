@@ -103,6 +103,12 @@ install_and_build() {
         PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
         echo "📍 Detected public IP: $PUBLIC_IP"
         
+        # Update config.yml with detected IP
+        if [ -f "config.yml" ]; then
+            sed -i "s/server_ip: .*/server_ip: \"$PUBLIC_IP\"/" config.yml
+            echo "✅ Updated config.yml with server IP"
+        fi
+        
         # Generate SSL certificate if it doesn't exist
         SSL_GENERATED=false
         if [ ! -f "/etc/ssl/certs/catlog.crt" ]; then
@@ -136,6 +142,21 @@ install_and_build() {
         echo "✅ Nginx reverse proxy configured with SSL"
         echo "📍 Access via: https://$PUBLIC_IP/catlog"
         echo "⚠️  Browser will show security warning - click 'Advanced' → 'Proceed'"
+    fi
+
+    # Setup auto-start on boot (Linux only)
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "⏰ Setting up auto-start on boot..."
+        CURRENT_DIR=$(pwd)
+        
+        # Check if crontab entry already exists
+        if ! crontab -l 2>/dev/null | grep -q "catlog restart"; then
+            # Add crontab entry for auto-start
+            (crontab -l 2>/dev/null; echo "@reboot sleep 60 && cd $CURRENT_DIR && ./catlog restart") | crontab -
+            echo "✅ Auto-start configured - catlog will restart automatically on server reboot"
+        else
+            echo "✅ Auto-start already configured"
+        fi
     fi
 
     echo "✅ Catlog installed successfully!"
@@ -221,6 +242,60 @@ case "$1" in
         fi
         ;;
     
+    restart)
+        echo "🔄 Restarting Catlog with IP detection..."
+        
+        # Stop current service
+        $0 stop
+        
+        # Detect current IP
+        echo "🌐 Detecting public IP..."
+        NEW_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
+        echo "📍 Current IP: $NEW_IP"
+        
+        # Update config.yml with new IP
+        if [ -f "config.yml" ]; then
+            sed -i "s/server_ip: .*/server_ip: \"$NEW_IP\"/" config.yml
+            echo "✅ Updated config.yml with new IP"
+        fi
+        
+        # Linux-specific SSL and nginx updates
+        if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
+            # Regenerate SSL certificates
+            echo "🔒 Regenerating SSL certificates..."
+            sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /etc/ssl/private/catlog.key \
+                -out /etc/ssl/certs/catlog.crt \
+                -subj "/C=US/ST=State/L=City/O=Catlog/CN=$NEW_IP" 2>/dev/null
+            
+            sudo chmod 600 /etc/ssl/private/catlog.key
+            sudo chmod 644 /etc/ssl/certs/catlog.crt
+            echo "✅ SSL certificates regenerated"
+            
+            # Update nginx config
+            echo "🌐 Updating nginx configuration..."
+            sed "s/SERVER_IP/$NEW_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
+            sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
+            rm /tmp/catlog-nginx-configured
+            
+            # Ensure nginx site is enabled
+            sudo ln -sf /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
+            
+            # Reload nginx
+            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
+            echo "✅ Nginx updated and reloaded"
+        fi
+        
+        # Start catlog
+        echo "🚀 Starting Catlog..."
+        $0 start
+        
+        echo ""
+        echo "🎉 Catlog restarted successfully!"
+        echo "📍 Access via: https://$NEW_IP/login"
+        echo "📍 Or via HTTP: http://$NEW_IP/login"
+        ;;
+    
     update)
         echo "🔄 Updating Catlog..."
         
@@ -281,6 +356,15 @@ case "$1" in
         sudo rm -f /etc/ssl/certs/catlog.crt
         sudo rm -f /etc/ssl/private/catlog.key
         
+        # Remove auto-start crontab entry (Linux only)
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            echo "⏰ Removing auto-start configuration..."
+            if crontab -l 2>/dev/null | grep -q "catlog restart"; then
+                crontab -l 2>/dev/null | grep -v "catlog restart" | crontab -
+                echo "✅ Auto-start configuration removed"
+            fi
+        fi
+        
         # Remove runtime directory
         echo "📁 Removing runtime files..."
         rm -rf runtime/
@@ -305,7 +389,7 @@ case "$1" in
         ;;
     
     *)
-        echo "Usage: catlog {start|stop|status|install|update|uninstall}"
+        echo "Usage: catlog {start|stop|status|install|update|restart|uninstall}"
         echo ""
         echo "Commands:"
         echo "  start     - Start Catlog server in background"
@@ -313,6 +397,7 @@ case "$1" in
         echo "  status    - Check if Catlog is running"
         echo "  install   - Install dependencies and build"
         echo "  update    - Stop, rebuild, and restart server"
+        echo "  restart   - Restart with IP detection and SSL regeneration"
         echo "  uninstall - Remove all catlog files and configurations"
         exit 1
         ;;

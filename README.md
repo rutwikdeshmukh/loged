@@ -22,6 +22,7 @@ Catlog is an open-source, minimal log viewer that runs entirely on your server w
 - **Nginx with SSL** - automatic setup with SSL-ready configuration
 - **Rate Limiting** - protection against excessive requests and web crawlers/bots
 - **Custom Timezone Support** - logs displayed in configured timezone
+- **Auto-start on Boot** - automatically restarts after server reboot (Linux)
 
 ### Supported Operating Systems
 - Linux
@@ -50,6 +51,7 @@ This will automatically:
 - Build the application
 - Configure nginx reverse proxy with rate limiting
 - Set up IST timezone
+- **Configure auto-start on server reboot (Linux only)**
 - Set up everything for production use
 
 ### Manual Installation
@@ -84,6 +86,7 @@ This will automatically:
 ./catlog stop       # Stop server
 ./catlog status     # Check if server is running
 ./catlog update     # Stop, rebuild, and restart server
+./catlog restart    # Restart with IP detection and SSL regeneration
 ./catlog uninstall  # Remove all catlog files and configurations
 ```
 
@@ -94,6 +97,7 @@ Edit `config.yml` to customize users, log files, port, and authentication:
 ```yaml
 # Configuration file for the log monitoring application
 port: 8008
+server_ip: "127.0.0.1"  # Auto-updated by restart command
 timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
   enabled: true
@@ -147,6 +151,28 @@ log_files:
 - Session-based authentication with login/logout
 
 **Note:** Change the default credentials before deploying to production.
+
+### Server Restart Handling
+
+The `restart` command automatically handles server IP changes:
+
+```bash
+./catlog restart    # Detects new IP, regenerates SSL, updates nginx
+```
+
+**What it does:**
+- Detects current public IP address
+- Updates `server_ip` in config.yml
+- Regenerates SSL certificates with new IP
+- Updates nginx configuration
+- Reloads nginx and restarts catlog
+
+**Auto-start on boot:**
+Auto-start is automatically configured during installation. If you need to set it up manually:
+```bash
+crontab -e
+@reboot sleep 60 && cd /path/to/catlog && ./catlog restart
+```
 
 ### Rate Limiting
 Automatic rate limiting is configured:
@@ -206,6 +232,6 @@ catlog/
 ```
 ## Total Hours Spent on this Idea
 ```
-14
+18
 ```
 Update the counter like a message smeared on a wall with blood to let others know how much efforts have been made :)

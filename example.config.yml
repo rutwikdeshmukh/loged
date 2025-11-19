@@ -1,5 +1,6 @@
 # Configuration file for the log monitoring application
 port: 8008
+server_ip: "127.0.0.1"  # Auto-updated by restart command
 timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
   enabled: true
