@@ -259,8 +259,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #f8f9fa;
-    color: #343a40; 
+    background: #282a36;
+    color: #f8f8f2; 
     min-height: 100vh;
 }
 .container { 
@@ -269,22 +269,21 @@ body {
     padding: 40px 20px; 
 }
 h1 { 
-    color: #495057; 
+    color: #bd93f9; 
     text-align: center; 
     margin-bottom: 40px; 
     font-size: 32px; 
     font-weight: 600;
 }
 .section { 
-    background: #ffffff;
+    background: #44475a;
     margin: 25px 0; 
     padding: 25px; 
     border-radius: 8px; 
-    border: 1px solid #dee2e6;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #6272a4;
 }
 .section h3 { 
-    color: #495057; 
+    color: #50fa7b; 
     margin-top: 0; 
     font-size: 20px; 
     font-weight: 500;
@@ -293,16 +292,16 @@ h1 {
 .log-item { 
     margin: 15px 0; 
     padding: 15px; 
-    background: #f8f9fa;
+    background: #282a36;
     border-radius: 6px; 
-    border-left: 4px solid #6c757d;
+    border-left: 4px solid #8be9fd;
     transition: border-color 0.2s ease;
 }
 .log-item:hover { 
-    border-left-color: #495057;
+    border-left-color: #50fa7b;
 }
 .log-item a { 
-    color: #495057; 
+    color: #f8f8f2; 
     text-decoration: none; 
     font-weight: 500; 
     font-size: 16px;
@@ -310,10 +309,10 @@ h1 {
     margin-bottom: 5px;
 }
 .log-item a:hover { 
-    color: #212529;
+    color: #8be9fd;
 }
 .log-item small { 
-    color: #6c757d; 
+    color: #6272a4; 
     font-size: 13px; 
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
 }
@@ -327,21 +326,21 @@ h1 {
     padding: 12px 15px; 
     flex: 1; 
     min-width: 300px; 
-    background: #ffffff; 
-    border: 1px solid #ced4da; 
+    background: #282a36; 
+    border: 1px solid #6272a4; 
     border-radius: 6px; 
-    color: #495057; 
+    color: #f8f8f2; 
     font-size: 14px;
 }
 .custom-form input:focus { 
     outline: none; 
-    border-color: #6c757d; 
-    box-shadow: 0 0 0 2px rgba(108,117,125,0.1);
+    border-color: #bd93f9; 
+    box-shadow: 0 0 0 2px rgba(189,147,249,0.2);
 }
 .custom-form button { 
     padding: 12px 20px; 
-    background: #6c757d; 
-    color: white; 
+    background: #bd93f9; 
+    color: #282a36; 
     border: none; 
     border-radius: 6px; 
     cursor: pointer; 
@@ -349,11 +348,11 @@ h1 {
     transition: background 0.2s;
 }
 .custom-form button:hover { 
-    background: #5a6268;
+    background: #8be9fd;
 }
 .empty-state { 
     text-align: center; 
-    color: #6c757d; 
+    color: #6272a4; 
     font-style: italic; 
     padding: 20px;
 }
@@ -411,42 +410,41 @@ h1 {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #f8f9fa;
-    color: #343a40; 
+    background: #282a36;
+    color: #f8f8f2; 
     height: 100vh;
 }
 .header { 
-    background: #ffffff;
+    background: #44475a;
     padding: 20px 25px; 
-    border-bottom: 1px solid #dee2e6;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #6272a4;
 }
 .back-link { 
-    color: #6c757d; 
+    color: #8be9fd; 
     text-decoration: none; 
     margin-right: 20px; 
     font-weight: 500;
     transition: color 0.2s;
 }
 .back-link:hover { 
-    color: #495057;
+    color: #50fa7b;
 }
 h1 { 
-    color: #495057; 
+    color: #bd93f9; 
     margin: 0; 
     display: inline-block; 
     font-size: 24px;
     font-weight: 600;
 }
 #status { 
-    color: #6c757d; 
+    color: #6272a4; 
     margin: 10px 0 0 0; 
     font-size: 14px;
     padding: 8px 12px;
-    background: #f8f9fa;
+    background: #282a36;
     border-radius: 4px;
     display: inline-block;
-    border: 1px solid #dee2e6;
+    border: 1px solid #44475a;
 }
 .container { 
     padding: 20px; 
@@ -460,13 +458,13 @@ h1 {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #ffffff;
+    background: #44475a;
     border-radius: 6px;
-    border: 1px solid #dee2e6;
+    border: 1px solid #6272a4;
 }
 #loadMoreBtn {
-    background: #6c757d;
-    color: white;
+    background: #ff79c6;
+    color: #282a36;
     border: none;
     padding: 10px 16px;
     border-radius: 4px;
@@ -476,22 +474,23 @@ h1 {
     transition: background 0.2s;
 }
 #loadMoreBtn:hover { 
-    background: #5a6268;
+    background: #ffb86c;
 }
 #loadMoreBtn:disabled { 
-    background: #adb5bd;
+    background: #6272a4;
     cursor: not-allowed;
+    color: #f8f8f2;
 }
 .log-info {
-    color: #6c757d;
+    color: #6272a4;
     font-size: 14px;
 }
 #logs { 
-    background: #ffffff;
+    background: #282a36;
     padding: 15px; 
     flex: 1; 
     overflow-y: auto; 
-    border: 1px solid #dee2e6; 
+    border: 1px solid #44475a; 
     border-radius: 6px;
     font-size: 13px;
     line-height: 1.5;
@@ -504,24 +503,24 @@ h1 {
     transition: background 0.2s;
 }
 .log-line:hover {
-    background: #f8f9fa;
+    background: #44475a;
 }
 .log-line.new {
-    background: #d4edda;
+    background: rgba(80,250,123,0.2);
     animation: fadeOut 2s ease-out forwards;
 }
 @keyframes fadeOut {
-    0%% { background: #d4edda; }
+    0%% { background: rgba(80,250,123,0.2); }
     100%% { background: transparent; }
 }
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f8f9fa; }
+::-webkit-scrollbar-track { background: #44475a; }
 ::-webkit-scrollbar-thumb { 
-    background: #dee2e6; 
+    background: #6272a4; 
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover { 
-    background: #ced4da;
+    background: #bd93f9;
 }
 </style>
 </head>
@@ -580,7 +579,11 @@ ws.onmessage = function(event) {
     // Regular log line
     const line = document.createElement('div');
     line.className = 'log-line new';
-    line.textContent = data;
+    
+    // Highlight error keywords
+    let content = data;
+    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #ff5555; font-weight: bold;">$1</span>');
+    line.innerHTML = content;
     
     // If it's a new real-time log (not from load more)
     if (!data.startsWith('__HISTORICAL__:')) {
@@ -591,8 +594,9 @@ ws.onmessage = function(event) {
         updateLogInfo();
     } else {
         // Historical line from load more
-        const content = data.substring('__HISTORICAL__:'.length);
-        line.textContent = content;
+        const originalContent = data.substring('__HISTORICAL__:'.length);
+        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #ff5555; font-weight: bold;">$1</span>');
+        line.innerHTML = highlightedContent;
         line.classList.remove('new');
         logs.insertBefore(line, logs.firstChild);
         shownLines++;
@@ -632,7 +636,9 @@ function loadMore() {
             data.lines.forEach(lineText => {
                 const line = document.createElement('div');
                 line.className = 'log-line';
-                line.textContent = lineText;
+                // Highlight error keywords
+                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #ff5555; font-weight: bold;">$1</span>');
+                line.innerHTML = highlightedText;
                 logs.insertBefore(line, logs.firstChild);
             });
             
