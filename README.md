@@ -91,6 +91,10 @@ Edit `config.yml` to customize log files, port, and authentication:
 ```yaml
 # Configuration file for the log monitoring application
 port: 8008
+ssl:
+  enabled: true
+  cert_path: "/etc/ssl/certs/loged.crt"
+  key_path: "/etc/ssl/private/loged.key"
 auth:
   enabled: true
   username: "admin"
@@ -105,6 +109,11 @@ log_files:
   - name: "Application Log"
     path: "./app.log"
 ```
+
+**SSL Options:**
+- `enabled: true/false` - Enable or disable SSL certificate generation
+- `cert_path` - Path to SSL certificate file
+- `key_path` - Path to SSL private key file
 
 **Authentication Options:**
 - `enabled: true/false` - Enable or disable basic authentication

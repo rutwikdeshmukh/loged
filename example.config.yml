@@ -3,6 +3,10 @@
 # COPY ITS CONTENTS TO 'config.yml' ONCE UPDATED TO TAKE EFFECT
 
 port: 8008
+ssl:
+  enabled: true
+  cert_path: "/etc/ssl/certs/loged.crt"
+  key_path: "/etc/ssl/private/loged.key"
 auth:
   enabled: true
   username: "admin" # TO BE CHANGED BEFORE INITIAL SETUP
@@ -10,9 +14,12 @@ auth:
 log_files:
   - name: "Sample Log"
     path: "./src/sample.log"
-  - name: "EXAMPLE1"
-    path: "EXAMPLE/1/LOG/PATH"
-  - name: "EXAMPLE2"
-    path: "EXAMPLE/2/LOG/PATH"
-  - name: "EXAMPLE3"
-    path: "EXAMPLE/3/LOG/PATH"
+  - name: "System Log"
+    path: "/var/log/syslog"
+  - name: "Nginx Access Log"
+    path: "/var/log/nginx/access.log"
+  - name: "Nginx Error Log"
+    path: "/var/log/nginx/error.log"
+  - name: "Loged Log"
+    path: "./runtime/loged.log"
+# Add more log files as needed
