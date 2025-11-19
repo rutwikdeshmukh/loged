@@ -139,8 +139,18 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
+		// Get client IP
+		clientIP := r.Header.Get("X-Real-IP")
+		if clientIP == "" {
+			clientIP = r.Header.Get("X-Forwarded-For")
+		}
+		if clientIP == "" {
+			clientIP = r.RemoteAddr
+		}
+
 		username, password, ok := r.BasicAuth()
 		if !ok || username != config.Auth.Username || password != config.Auth.Password {
+			log.Printf("AUTH FAILED: IP=%s, Username=%s", clientIP, username)
 			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
 			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintf(w, `
@@ -160,6 +170,7 @@ h1 { color: #2196F3; }
 			return
 		}
 
+		log.Printf("AUTH SUCCESS: IP=%s, Username=%s", clientIP, username)
 		handler(w, r)
 	}
 }
