@@ -95,6 +95,10 @@ install_and_build() {
     if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
         echo "🌐 Setting up nginx reverse proxy..."
         
+        # Set timezone to IST for consistent logging
+        echo "🕐 Setting timezone to IST..."
+        sudo timedatectl set-timezone Asia/Kolkata 2>/dev/null || echo "⚠️  Could not set timezone automatically"
+        
         # Get public IP dynamically
         PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
         echo "📍 Detected public IP: $PUBLIC_IP"
@@ -233,6 +237,10 @@ case "$1" in
         # Always update nginx config if on Linux
         if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
             echo "🌐 Updating nginx configuration..."
+            
+            # Set timezone to IST for consistent logging
+            echo "🕐 Setting timezone to IST..."
+            sudo timedatectl set-timezone Asia/Kolkata 2>/dev/null || echo "⚠️  Could not set timezone automatically"
             
             # Get public IP dynamically
             PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")

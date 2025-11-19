@@ -1,25 +1,24 @@
-# Example Configuration file for the log monitoring application
-
-# COPY ITS CONTENTS TO 'config.yml' ONCE UPDATED TO TAKE EFFECT
-
+# Configuration file for the log monitoring application
 port: 8008
+timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
   enabled: true
   cert_path: "/etc/ssl/certs/loged.crt"
   key_path: "/etc/ssl/private/loged.key"
 auth:
   enabled: true
-  username: "admin" # TO BE CHANGED BEFORE INITIAL SETUP
-  password: "loged123" # TO BE CHANGED BEFORE INITIAL SETUP
+  username: "admin"
+  password: "loged123"
 log_files:
   - name: "Sample Log"
     path: "./src/sample.log"
   - name: "System Log"
     path: "/var/log/syslog"
   - name: "Nginx Access Log"
-    path: "/var/log/nginx/access.log"
+    path: "/var/log/nginx/loged_access.log"
+  - name: "Nginx SSL Access Log"
+    path: "/var/log/nginx/loged_ssl_access.log"
   - name: "Nginx Error Log"
     path: "/var/log/nginx/error.log"
   - name: "Loged Log"
     path: "./runtime/loged.log"
-# Add more log files as needed
