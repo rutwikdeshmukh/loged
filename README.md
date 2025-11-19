@@ -37,7 +37,7 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 ### One-Command Installation (Linux/macOS/WSL)
 
 ```bash
-git clone <repo-url> && cd loged && ./loged
+git clone https://github.com/rutwikdeshmukh/loged.git && cd loged && ./loged
 ```
 
 ### Manual Installation
@@ -45,7 +45,7 @@ git clone <repo-url> && cd loged && ./loged
 1. **Install Go 1.21+** from https://golang.org/dl/
 2. **Clone and setup:**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/rutwikdeshmukh/loged.git
    cd loged
    ./loged install
    ```
@@ -55,7 +55,7 @@ git clone <repo-url> && cd loged && ./loged
 1. **Install Go** from https://golang.org/dl/ (download the .msi installer)
 2. **Clone and build:**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/rutwikdeshmukh/loged.git
    cd loged
    go mod tidy
    go build -o loged-server.exe main.go
