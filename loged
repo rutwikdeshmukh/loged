@@ -94,21 +94,25 @@ case "$1" in
         ;;
     
     stop)
-        if [ ! -f "$PIDFILE" ]; then
-            echo "Loged is not running"
-            exit 1
+        echo "🛑 Stopping Loged..."
+        
+        # Kill by PID file first
+        if [ -f "$PIDFILE" ]; then
+            PID=$(cat "$PIDFILE")
+            if ps -p "$PID" > /dev/null 2>&1; then
+                kill "$PID"
+                sleep 1
+            fi
+            rm -f "$PIDFILE"
         fi
         
-        PID=$(cat "$PIDFILE")
-        if ps -p "$PID" > /dev/null 2>&1; then
-            echo "🛑 Stopping Loged (PID: $PID)..."
-            kill "$PID"
-            rm -f "$PIDFILE"
-            echo "✅ Loged stopped"
-        else
-            echo "Loged is not running"
-            rm -f "$PIDFILE"
-        fi
+        # Kill any remaining loged-server processes
+        pkill -f loged-server > /dev/null 2>&1
+        
+        # Wait a moment for processes to terminate
+        sleep 2
+        
+        echo "✅ Loged stopped"
         ;;
     
     status)
@@ -128,7 +132,16 @@ case "$1" in
     
     update)
         echo "🔄 Updating Loged..."
-        $0 stop
+        
+        # Stop server if running (suppress output)
+        if [ -f "$PIDFILE" ]; then
+            PID=$(cat "$PIDFILE")
+            if ps -p "$PID" > /dev/null 2>&1; then
+                echo "🛑 Stopping server..."
+                $0 stop > /dev/null 2>&1
+            fi
+        fi
+        
         sleep 1
         install_and_build
         echo ""

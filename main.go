@@ -684,6 +684,8 @@ func handleLoadMore(w http.ResponseWriter, r *http.Request) {
 	
 	json.NewEncoder(w).Encode(response)
 }
+
+func main() {
 	port := flag.String("port", "", "Port to run server on (overrides config)")
 	flag.Parse()
 

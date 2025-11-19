@@ -17,7 +17,12 @@ profile.cov
 # Go workspace file
 go.work
 go.work.sum
+
+# Application Artifacts
 loged-server
+loged-server*
+loged.log
+
 # env file
 .env
 
