@@ -319,7 +319,7 @@ h1 {
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
     
     <div class="ssl-warning">
-        <h3>🔒 SSL Certificate Notice</h3>
+        <h3>SSL Certificate Notice</h3>
         <p>This server uses a self-signed SSL certificate for secure connections.</p>
         <p>Your browser may show a security warning - this is normal and expected.</p>
         <p>Click "Advanced" → "Proceed to site" to continue safely.</p>

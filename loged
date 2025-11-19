@@ -246,6 +246,40 @@ case "$1" in
         $0 start
         ;;
     
+    uninstall)
+        echo "🗑️ Uninstalling Loged..."
+        
+        # Stop server if running
+        $0 stop 2>/dev/null || true
+        
+        # Remove nginx configuration
+        if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
+            echo "🌐 Removing nginx configuration..."
+            sudo rm -f /etc/nginx/sites-enabled/loged
+            sudo rm -f /etc/nginx/sites-available/loged
+            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || true
+        fi
+        
+        # Remove SSL certificates
+        echo "🔒 Removing SSL certificates..."
+        sudo rm -f /etc/ssl/certs/loged.crt
+        sudo rm -f /etc/ssl/private/loged.key
+        
+        # Remove runtime directory
+        echo "📁 Removing runtime files..."
+        rm -rf runtime/
+        
+        # Remove built binary
+        rm -f loged-server
+        
+        # Remove log and pid files
+        rm -f loged.log loged.pid
+        
+        echo "✅ Loged uninstalled successfully"
+        echo "📝 Note: Go and nginx packages were not removed"
+        echo "📝 Note: config.yml was preserved"
+        ;;
+    
     ""|install)
         install_and_build
         echo ""
@@ -255,14 +289,15 @@ case "$1" in
         ;;
     
     *)
-        echo "Usage: loged {start|stop|status|install|update}"
+        echo "Usage: loged {start|stop|status|install|update|uninstall}"
         echo ""
         echo "Commands:"
-        echo "  start   - Start Loged server in background"
-        echo "  stop    - Stop Loged server"
-        echo "  status  - Check if Loged is running"
-        echo "  install - Install dependencies and build"
-        echo "  update  - Stop, rebuild, and restart server"
+        echo "  start     - Start Loged server in background"
+        echo "  stop      - Stop Loged server"
+        echo "  status    - Check if Loged is running"
+        echo "  install   - Install dependencies and build"
+        echo "  update    - Stop, rebuild, and restart server"
+        echo "  uninstall - Remove all loged files and configurations"
         exit 1
         ;;
 esac
