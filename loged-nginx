@@ -1,6 +1,18 @@
 server {
     listen 80;
-    server_name loged.logs;
+    server_name SERVER_IP;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name SERVER_IP;
+
+    ssl_certificate /etc/ssl/certs/loged.crt;
+    ssl_certificate_key /etc/ssl/private/loged.key;
+    
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
 
     location /loged {
         proxy_pass http://127.0.0.1:8008;

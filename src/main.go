@@ -236,6 +236,107 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleLanding(w http.ResponseWriter, r *http.Request) {
+	// Get base path for URLs (detect if behind reverse proxy)
+	basePath := ""
+	originalURI := r.Header.Get("X-Original-URI")
+	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
+		basePath = "/loged"
+	}
+	
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprintf(w, `
+<!DOCTYPE html>
+<html>
+<head>
+<title>Loged - Real-time Log Viewer</title>
+<style>
+* { box-sizing: border-box; }
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    margin: 0; padding: 0; 
+    background: #1e1f29;
+    color: #f8f8f2; 
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container { 
+    max-width: 600px; 
+    padding: 40px; 
+    text-align: center;
+}
+h1 { 
+    color: #bd93f9; 
+    font-size: 48px; 
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+.subtitle {
+    color: #6272a4;
+    font-size: 18px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+.ssl-warning {
+    background: #383a59;
+    padding: 25px;
+    border-radius: 8px;
+    border-left: 4px solid #ffb86c;
+    margin-bottom: 30px;
+    text-align: left;
+}
+.ssl-warning h3 {
+    color: #ffb86c;
+    margin-top: 0;
+    font-size: 20px;
+}
+.ssl-warning p {
+    color: #f8f8f2;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+.proceed-btn {
+    background: #50fa7b;
+    color: #1e1f29;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.proceed-btn:hover {
+    background: #8be9fd;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>loged</h1>
+    <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
+    
+    <div class="ssl-warning">
+        <h3>🔒 SSL Certificate Notice</h3>
+        <p>This server uses a self-signed SSL certificate for secure connections.</p>
+        <p>Your browser may show a security warning - this is normal and expected.</p>
+        <p>Click "Advanced" → "Proceed to site" to continue safely.</p>
+    </div>
+    
+    <button class="proceed-btn" onclick="proceedToApp()">Proceed to Log Viewer</button>
+</div>
+
+<script>
+function proceedToApp() {
+    window.location.href = '%s/app';
+}
+</script>
+</body>
+</html>`, basePath)
+}
+
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	logPath := r.URL.Query().Get("file")
 	log.Printf("HTTP request for path: %s, file param: %s", r.URL.Path, logPath)
@@ -741,7 +842,8 @@ func main() {
 		fmt.Sscanf(*port, "%d", &config.Port)
 	}
 
-	http.HandleFunc("/", requireAuth(handleIndex))
+	http.HandleFunc("/", handleLanding)
+	http.HandleFunc("/app", requireAuth(handleIndex))
 	http.HandleFunc("/ws", requireAuth(handleWebSocket))
 	http.HandleFunc("/api/loadmore", requireAuth(handleLoadMore))
 

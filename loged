@@ -94,11 +94,36 @@ install_and_build() {
     # Setup nginx reverse proxy (Linux only)
     if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
         echo "🌐 Setting up nginx reverse proxy..."
-        sudo cp loged-nginx /etc/nginx/sites-available/loged
+        
+        # Get public IP dynamically
+        PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
+        echo "📍 Detected public IP: $PUBLIC_IP"
+        
+        # Generate SSL certificate if it doesn't exist
+        if [ ! -f "/etc/ssl/certs/loged.crt" ]; then
+            echo "🔒 Generating SSL certificate..."
+            sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /etc/ssl/private/loged.key \
+                -out /etc/ssl/certs/loged.crt \
+                -subj "/C=US/ST=State/L=City/O=Loged/CN=$PUBLIC_IP" 2>/dev/null
+            
+            sudo chmod 600 /etc/ssl/private/loged.key
+            sudo chmod 644 /etc/ssl/certs/loged.crt
+            echo "✅ SSL certificate generated"
+        else
+            echo "✅ SSL certificate already exists"
+        fi
+        
+        # Create nginx config with dynamic IP
+        sed "s/SERVER_IP/$PUBLIC_IP/g" loged-nginx > /tmp/loged-nginx-configured
+        sudo cp /tmp/loged-nginx-configured /etc/nginx/sites-available/loged
+        rm /tmp/loged-nginx-configured
+        
         sudo ln -sf /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
         sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
-        echo "✅ Nginx reverse proxy configured"
-        echo "📍 Access via: http://loged.logs/loaded (add '127.0.0.1 loged.logs' to /etc/hosts)"
+        echo "✅ Nginx reverse proxy configured with SSL"
+        echo "📍 Access via: https://$PUBLIC_IP/loged"
+        echo "⚠️  Browser will show security warning - click 'Advanced' → 'Proceed'"
     fi
 
     echo "✅ Loged installed successfully!"
@@ -200,7 +225,15 @@ case "$1" in
         # Always update nginx config if on Linux
         if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
             echo "🌐 Updating nginx configuration..."
-            sudo cp loged-nginx /etc/nginx/sites-available/loged
+            
+            # Get public IP dynamically
+            PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
+            
+            # Create nginx config with dynamic IP
+            sed "s/SERVER_IP/$PUBLIC_IP/g" loged-nginx > /tmp/loged-nginx-configured
+            sudo cp /tmp/loged-nginx-configured /etc/nginx/sites-available/loged
+            rm /tmp/loged-nginx-configured
+            
             if [ ! -L /etc/nginx/sites-enabled/loged ]; then
                 sudo ln -s /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
             fi
