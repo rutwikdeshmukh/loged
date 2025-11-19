@@ -7,20 +7,24 @@ A lightweight, real-time log streaming tool for Linux servers built with AI.
 Loged is an open-source, minimal log viewer that runs entirely on your server without requiring external backends or databases. It provides a web-based interface for monitoring log files in real-time, accessible from any browser.
 
 ### Features
-- **Real-time log streaming** via WebSocket connections
-- **Web-based interface** accessible from any browser
-- **Multiple log files support** - each file opens in separate tabs/windows
-- **Minimal resource footprint** - single Go binary, ~200 lines of code
-- **No external dependencies** - no databases or centralized services required
-- **Server-side only** - runs where your logs are located
-- **Auto-scroll** - new log entries appear automatically
-- **Modern UI** - clean, responsive interface with animated gradients and glass morphism effects
-- **Configuration-driven** - manage log files via config.yml
-- **Background service** - runs as daemon, doesn't occupy terminal
-- **Basic authentication** - secure access with username/password
-- **Pagination** - loads last 200 lines by default, load more on demand
-- **Nginx reverse proxy** - automatic setup with SSL-ready configuration
-- **SSL landing page** - explains SSL setup before authentication
+- **Real-Time Log Streaming** via Secure WebSocket Connections
+- **Multi-User Authentication** with role-based access control
+- **Web-based Interface** accessible from any browser
+- **Multiple Log Files Support** - each file opens in separately
+- **Minimal Resource Footprint** - single Go binary, ~1000 lines of code
+- **No External Dependencies** - no databases or centralized services required
+- **Configuration-Driven** - manage users and log files via single configuration file
+- **Supports Pagination** - loads last 200 lines by default, load more on demand
+- **Nginx with SSL** - automatic setup with SSL-ready configuration
+- **Rate Limiting** - protection against excessive requests and web crawlers/bots
+- **Custom Timezone Support** - logs displayed in configured timezone
+
+### Supported Operating Systems
+- Linux
+
+### Stack
+- Go
+- Nginx
 
 ### Target Audience
 - Developers and DevOps engineers needing quick log visibility
@@ -28,33 +32,26 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 - Teams using low-resource environments where Elastic Stack is overkill
 - Anyone wanting simple, fast log monitoring without heavy setup
 
-## Dependencies
-
-- **Go 1.21+** - Install from https://golang.org/dl/
-- **Linux/Unix system** with log files
-- **Read permissions** for target log files
-- **Modern web browser** with WebSocket support
-- **Nginx** (automatically installed on Linux)
-
 ## Installation
 
-### One-Command Installation (Linux/macOS/WSL)
+### One-Command Installation and Startup (Linux/macOS/WSL)
 
 ```bash
-git clone https://github.com/rutwikdeshmukh/loged && cd loged && chmod +x loged && ./loged install
+git clone https://github.com/rutwikdeshmukh/loged && cd loged && chmod +x loged && ./loged install  && ./loged start
 ```
 
 This will automatically:
 - Install Go if needed
 - Install nginx if needed (Linux only)
 - Build the application
-- Configure nginx reverse proxy
+- Configure nginx reverse proxy with rate limiting
+- Set up IST timezone
 - Set up everything for production use
 
 ### Manual Installation
 
 1. **Install Go 1.21+** from https://golang.org/dl/
-2. **Clone and setup:**
+2. **Run:**
    ```bash
    git clone https://github.com/rutwikdeshmukh/loged
    cd loged
@@ -62,7 +59,7 @@ This will automatically:
    ./loged install
    ```
 
-### Windows Installation
+<!-- ### Windows Installation
 
 1. **Install Go** from https://golang.org/dl/ (download the .msi installer)
 2. **Clone and build:**
@@ -71,7 +68,7 @@ This will automatically:
    cd loged
    go mod tidy
    go build -o runtime/loged-server.exe src/main.go
-   ```
+   ``` -->
 
 ## Usage
 
@@ -88,143 +85,110 @@ This will automatically:
 
 ### Configuration
 
-Edit `config.yml` to customize log files, port, and authentication:
+Edit `config.yml` to customize users, log files, port, and authentication:
 
 ```yaml
 # Configuration file for the log monitoring application
 port: 8008
+timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
   enabled: true
   cert_path: "/etc/ssl/certs/loged.crt"
   key_path: "/etc/ssl/private/loged.key"
 auth:
   enabled: true
-  username: "admin"
-  password: "loged123"
+  users:
+    - username: "admin"
+      password: "loged123"
+      role: "admin"  # admin has access to all logs
+    - username: "BEDeveloper"
+      password: "backend123"
+      role: "backend"
+      allowed_paths:
+        - "/var/log/supervisor/*"
+        - "/var/log/app/*"
+        - "./runtime/loged.log"
+    - username: "FEDeveloper"
+      password: "frontend123"
+      role: "frontend"
+      allowed_paths:
+        - "/var/log/nginx/*"
+        - "/var/log/apache2/*"
+    - username: "DevOps"
+      password: "devops123"
+      role: "devops"
+      allowed_paths:
+        - "/var/log/syslog"
+        - "/var/log/auth.log"
+        - "/var/log/nginx/*"
 log_files:
   - name: "Sample Log"
     path: "./src/sample.log"
   - name: "System Log"
     path: "/var/log/syslog"
-  - name: "Auth Log"
-    path: "/var/log/auth.log"
-  - name: "Application Log"
-    path: "./app.log"
+  - name: "Nginx Access Log"
+    path: "/var/log/nginx/loged_access.log"
+  - name: "Nginx SSL Access Log"
+    path: "/var/log/nginx/loged_ssl_access.log"
+  - name: "Nginx Error Log"
+    path: "/var/log/nginx/error.log"
+  - name: "Loged Log"
+    path: "./runtime/loged.log"
 ```
 
-**SSL Options:**
-- `enabled: true/false` - Enable or disable SSL certificate generation
-- `cert_path` - Path to SSL certificate file
-- `key_path` - Path to SSL private key file
+### RBAC
+- `admin` role has access to all logs
+- Other roles have restricted access based on `allowed_paths` in `config.yml`
+- Supports wildcard patterns (e.g., `/var/log/nginx/*`)
+- Session-based authentication with login/logout
 
-**Authentication Options:**
-- `enabled: true/false` - Enable or disable basic authentication
-- `username` - Username for accessing the log viewer
-- `password` - Password for accessing the log viewer
+**Note:** Change the default credentials before deploying to production.
 
-**Security Note:** Change the default credentials before deploying to production.
+### Rate Limiting
+Automatic rate limiting is configured:
+- General endpoints: 30 requests/minute
+- API endpoints: 10 requests/minute
+- Burst protection included
 
 ### Accessing the Interface
 
-#### Direct Access
-1. **Start the server:**
-   ```bash
-   ./loged start
-   ```
-
-2. **Open your browser to:** `http://<your-server-ip>:8008`
-
-#### Via Nginx Reverse Proxy (Linux)
-1. **Add to /etc/hosts:**
-   ```
-   <your-server-ip> <your-domain.com>
-   ```
-
-2. **Visit landing page:** `http://<your-domain.com>/loged`
-3. **Click "Proceed to Log Viewer"** (redirects to HTTPS)
-4. **Accept SSL certificate** (browser security warning)
-5. **Enter credentials** when prompted
+1. **Visit login page:** `https://<your-server-ip>/login`
+2. **Login with credentials** from config.yml
+3. **Browse available logs** based on your user permissions
+4. **Click logout** for clean session termination
 
 ### Using the Interface
 
-1. **Visit landing page** (explains SSL setup)
-
-2. **Proceed to secure viewer** (HTTPS with authentication)
-
-3. **Login with credentials** from config.yml
-
-4. **Select log files:**
-   - Choose from configured log files on the homepage
-   - Or enter a custom log file path
-   - Each log file opens in its own view
-
-5. **Real-time monitoring:**
-   - Logs stream in real-time as new lines are appended
+1. **Login** with your username and password
+2. **Select log files** from your available list (filtered by permissions)
+3. **Real-time monitoring:**
+   - Logs stream in real-time
    - Shows last 200 lines by default
    - Click "Load 100 More Lines" to see older entries
-   - Auto-scroll keeps latest entries visible
    - Error keywords highlighted in red
    - Open multiple tabs for different log files
-
-### Direct URL Access
-
-Bookmark or share direct links to specific log files:
-
-**Direct access:**
-```
-http://<your-server-ip>:8008?file=/var/log/syslog
-http://<your-server-ip>:8008?file=/var/log/nginx/access.log
-```
-
-**Via nginx proxy:**
-```
-http://<your-domain.com>/loged?file=/var/log/syslog
-http://<your-domain.com>/loged?file=/var/log/nginx/access.log
-```
-
-### Command Line Options
-
-```bash
-./runtime/loged-server -port 8080    # Override config port (manual run)
-```
-
-The server will be accessible at `http://<your-server-ip>:8080` when run manually.
+4. **Logout** cleanly using the logout button
 
 ## Production Deployment
 
 ### Security Recommendations
-1. **Change default credentials** in config.yml
-2. **Use HTTPS** - Configure SSL certificate in nginx
-3. **Restrict file access** - Only allow specific log directories
-4. **Firewall rules** - Limit access to specific IPs
-5. **Run as dedicated user** with minimal permissions
-
-### SSL/HTTPS Setup
-The nginx configuration is ready for SSL. Add your certificates:
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name <your-domain.com>;
-    
-    ssl_certificate /path/to/your/certificate.crt;
-    ssl_certificate_key /path/to/your/private.key;
-    
-    location /loged {
-        # existing proxy configuration
-    }
-}
-```
+1. **Change Default Credentials** in config.yml to **Stronger Credentials**
+2. **Use HTTPS** - Use domain specific SSL certificates generated by a trrusted CA
+3. **Configure User Permissions** - Restrict access to specific log directories
+4. **Firewall Rules** - Limit access to specific IPs
+5. **Run as Dedicated User** with minimal permissions
 
 ## File Structure
 
 ```
 loged/
-├── README.md          # This documentation
-├── LICENSE            # License file
-├── config.yml         # Configuration file
-├── loged              # Installation and control script
-├── loged-nginx        # Nginx reverse proxy configuration
+├── README.md          # Documentation for this project
+├── LICENSE            # License
+├── config.yml         # Configuration file based on example.config.yml
+├── example.config.yml # Example configuration
+├── loged              # Installation and Control Script
+├── loged-nginx        # Nginx configuration
+├── .gitattributes     # Defines how the contents stored in the repository are copied to the working tree
 ├── .gitignore         # Git ignore rules
 ├── src/               # Source code directory
 │   ├── main.go        # Complete server implementation
@@ -236,7 +200,8 @@ loged/
     ├── loged.pid      # Process ID file (when running)
     └── loged.log      # Server logs (when running)
 ```
-
-## License
-
-Open source - feel free to modify and distribute.
+## Total Hours Spent on this Idea
+```
+14
+```
+Update the counter like a message smeared on a wall with blood to let others know how much efforts have been made :)
