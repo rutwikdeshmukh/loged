@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -48,7 +49,7 @@ func (ls *LogStreamer) AddClient(conn *websocket.Conn) {
 	ls.clients = append(ls.clients, conn)
 	ls.mutex.Unlock()
 	
-	// Send existing file content
+	// Send last 200 lines initially
 	go func() {
 		file, err := os.Open(ls.filename)
 		if err != nil {
@@ -56,10 +57,27 @@ func (ls *LogStreamer) AddClient(conn *websocket.Conn) {
 		}
 		defer file.Close()
 		
+		// Read all lines first
+		var lines []string
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
-			conn.WriteMessage(websocket.TextMessage, []byte(scanner.Text()))
+			lines = append(lines, scanner.Text())
 		}
+		
+		// Send last 200 lines
+		start := 0
+		if len(lines) > 200 {
+			start = len(lines) - 200
+		}
+		
+		for i := start; i < len(lines); i++ {
+			conn.WriteMessage(websocket.TextMessage, []byte(lines[i]))
+		}
+		
+		// Send initial line count
+		totalLines := len(lines)
+		shownLines := len(lines) - start
+		conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("__META__:INITIAL_LOAD:%d:%d", totalLines, shownLines)))
 	}()
 }
 
@@ -149,11 +167,33 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Client connected for file: %s", logPath)
 
 	for {
-		_, _, err := conn.ReadMessage()
+		_, message, err := conn.ReadMessage()
 		if err != nil {
 			log.Printf("Client disconnected: %v", err)
 			streamer.RemoveClient(conn)
 			break
+		}
+		
+		// Handle load more requests
+		if string(message) == "LOAD_MORE" {
+			go func() {
+				file, err := os.Open(logPath)
+				if err != nil {
+					return
+				}
+				defer file.Close()
+				
+				var lines []string
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					lines = append(lines, scanner.Text())
+				}
+				
+				conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("__META__:LOAD_MORE_RESPONSE:%d", len(lines))))
+				
+				// Send 100 more lines from the requested position
+				// This will be handled by the frontend
+			}()
 		}
 	}
 }
@@ -357,6 +397,31 @@ h1 {
     display: flex; 
     flex-direction: column;
 }
+.log-controls {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+#loadMoreBtn {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s;
+}
+#loadMoreBtn:hover { background: #1976D2; }
+#loadMoreBtn:disabled { 
+    background: #555; 
+    cursor: not-allowed; 
+}
+.log-info {
+    color: #888;
+    font-size: 12px;
+}
 #logs { 
     background: #000; 
     padding: 15px; 
@@ -399,6 +464,10 @@ h1 {
     <div id="status">Connecting...</div>
 </div>
 <div class="container">
+    <div class="log-controls">
+        <button id="loadMoreBtn" onclick="loadMore()">Load 100 More Lines</button>
+        <span class="log-info" id="logInfo">Loading...</span>
+    </div>
     <div id="logs"></div>
 </div>
 <script>
@@ -406,6 +475,12 @@ console.log('Connecting to WebSocket...');
 const ws = new WebSocket('ws://'+location.host+'/ws?file=%s');
 const logs = document.getElementById('logs');
 const status = document.getElementById('status');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const logInfo = document.getElementById('logInfo');
+
+let totalLines = 0;
+let shownLines = 0;
+let allLines = [];
 
 ws.onopen = function() {
     console.log('WebSocket connected');
@@ -414,11 +489,44 @@ ws.onopen = function() {
 };
 
 ws.onmessage = function(event) {
+    const data = event.data;
+    
+    // Handle metadata messages
+    if (data.startsWith('__META__:')) {
+        const parts = data.split(':');
+        if (parts[1] === 'INITIAL_LOAD') {
+            totalLines = parseInt(parts[2]);
+            shownLines = parseInt(parts[3]);
+            updateLogInfo();
+            return;
+        }
+        if (parts[1] === 'LOAD_MORE_RESPONSE') {
+            totalLines = parseInt(parts[2]);
+            return;
+        }
+    }
+    
+    // Regular log line
     const line = document.createElement('div');
     line.className = 'log-line new';
-    line.textContent = event.data;
-    logs.appendChild(line);
-    logs.scrollTop = logs.scrollHeight;
+    line.textContent = data;
+    
+    // If it's a new real-time log (not from load more)
+    if (!data.startsWith('__HISTORICAL__:')) {
+        logs.appendChild(line);
+        logs.scrollTop = logs.scrollHeight;
+        shownLines++;
+        totalLines++;
+        updateLogInfo();
+    } else {
+        // Historical line from load more
+        const content = data.substring('__HISTORICAL__:'.length);
+        line.textContent = content;
+        line.classList.remove('new');
+        logs.insertBefore(line, logs.firstChild);
+        shownLines++;
+        updateLogInfo();
+    }
     
     // Remove animation class after animation completes
     setTimeout(() => line.classList.remove('new'), 500);
@@ -435,12 +543,110 @@ ws.onerror = function(error) {
     status.textContent = 'Connection error';
     status.style.color = '#f44336';
 };
+
+function loadMore() {
+    if (shownLines >= totalLines) return;
+    
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.textContent = 'Loading...';
+    
+    // Request more lines from server
+    fetch('/api/loadmore?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
+        .then(response => response.json())
+        .then(data => {
+            const scrollPos = logs.scrollTop;
+            const scrollHeight = logs.scrollHeight;
+            
+            data.lines.forEach(lineText => {
+                const line = document.createElement('div');
+                line.className = 'log-line';
+                line.textContent = lineText;
+                logs.insertBefore(line, logs.firstChild);
+            });
+            
+            shownLines += data.lines.length;
+            
+            // Maintain scroll position
+            logs.scrollTop = scrollPos + (logs.scrollHeight - scrollHeight);
+            
+            updateLogInfo();
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = 'Load 100 More Lines';
+        })
+        .catch(error => {
+            console.error('Load more failed:', error);
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = 'Load 100 More Lines';
+        });
+}
+
+function updateLogInfo() {
+    logInfo.textContent = `Showing ${shownLines} of ${totalLines} lines`;
+    loadMoreBtn.style.display = shownLines >= totalLines ? 'none' : 'inline-block';
+}
 </script>
 </body>
 </html>`, filename, filename, logPath)
 }
 
-func main() {
+func handleLoadMore(w http.ResponseWriter, r *http.Request) {
+	logPath := r.URL.Query().Get("file")
+	offsetStr := r.URL.Query().Get("offset")
+	limitStr := r.URL.Query().Get("limit")
+	
+	if logPath == "" {
+		http.Error(w, "file parameter required", http.StatusBadRequest)
+		return
+	}
+	
+	offset := 0
+	limit := 100
+	
+	if offsetStr != "" {
+		fmt.Sscanf(offsetStr, "%d", &offset)
+	}
+	if limitStr != "" {
+		fmt.Sscanf(limitStr, "%d", &limit)
+	}
+	
+	file, err := os.Open(logPath)
+	if err != nil {
+		http.Error(w, "Cannot open file", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+	
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	
+	// Calculate range
+	start := offset
+	if start < 0 {
+		start = 0
+	}
+	end := start + limit
+	if end > len(lines) {
+		end = len(lines)
+	}
+	
+	var result []string
+	for i := start; i < end; i++ {
+		result = append(result, lines[i])
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	response := map[string]interface{}{
+		"lines": result,
+		"total": len(lines),
+		"offset": start,
+		"limit": limit,
+	}
+	
+	json.NewEncoder(w).Encode(response)
+}
 	port := flag.String("port", "", "Port to run server on (overrides config)")
 	flag.Parse()
 
@@ -457,6 +663,7 @@ func main() {
 
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/ws", handleWebSocket)
+	http.HandleFunc("/api/loadmore", handleLoadMore)
 
 	fmt.Printf("Loged server starting on port %d\n", config.Port)
 	fmt.Printf("Open http://localhost:%d in your browser\n", config.Port)
