@@ -46,11 +46,11 @@ install_and_build() {
 
     # Install dependencies
     echo "📦 Installing dependencies..."
-    go mod tidy
+    cd src && go mod tidy && cd ..
 
     # Build the application
     echo "🔨 Building loged..."
-    go build -o loged-server main.go
+    cd src && go build -o ../loged-server main.go && cd ..
 
     # Make it executable
     chmod +x loged-server
@@ -100,17 +100,25 @@ case "$1" in
         if [ -f "$PIDFILE" ]; then
             PID=$(cat "$PIDFILE")
             if ps -p "$PID" > /dev/null 2>&1; then
-                kill "$PID"
-                sleep 1
+                kill -TERM "$PID" 2>/dev/null || true
+                sleep 2
+                # Force kill if still running
+                if ps -p "$PID" > /dev/null 2>&1; then
+                    kill -KILL "$PID" 2>/dev/null || true
+                fi
             fi
             rm -f "$PIDFILE"
         fi
         
-        # Kill any remaining loged-server processes
-        pkill -f loged-server > /dev/null 2>&1
+        # Kill any remaining loged-server processes by name
+        pkill -f "loged-server" 2>/dev/null || true
+        sleep 1
         
-        # Wait a moment for processes to terminate
-        sleep 2
+        # Force kill any stubborn processes
+        pkill -9 -f "loged-server" 2>/dev/null || true
+        
+        # Kill any process using port 8008
+        lsof -ti:8008 2>/dev/null | xargs kill -9 2>/dev/null || true
         
         echo "✅ Loged stopped"
         ;;
@@ -133,16 +141,14 @@ case "$1" in
     update)
         echo "🔄 Updating Loged..."
         
-        # Stop server if running (suppress output)
-        if [ -f "$PIDFILE" ]; then
-            PID=$(cat "$PIDFILE")
-            if ps -p "$PID" > /dev/null 2>&1; then
-                echo "🛑 Stopping server..."
-                $0 stop > /dev/null 2>&1
-            fi
-        fi
+        # Force stop any running instances
+        echo "🛑 Stopping any running instances..."
+        $0 stop
         
-        sleep 1
+        # Extra cleanup - kill anything on port 8008
+        lsof -ti:8008 2>/dev/null | xargs kill -9 2>/dev/null || true
+        
+        sleep 2
         install_and_build
         echo ""
         echo "🚀 Starting updated server..."

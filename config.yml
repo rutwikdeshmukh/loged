@@ -6,7 +6,7 @@ auth:
   password: "loged123"
 log_files:
   - name: "Sample Log"
-    path: "./sample.log"
+    path: "./src/sample.log"
   - name: "System Log"
     path: "/var/log/syslog"
   - name: "Auth Log"
