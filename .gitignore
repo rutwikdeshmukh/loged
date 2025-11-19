@@ -1,9 +1,11 @@
 # Runtime directory (contains all generated files)
 runtime/
 
+# Configuration file (user-specific)
+config.yml
+
 # Legacy runtime files (in case they exist)
 loged-server
-loged-server*
 loged.pid
 loged.log
 
@@ -19,6 +21,3 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-
-# Config file
-config.yml

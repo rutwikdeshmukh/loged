@@ -4,7 +4,7 @@ A lightweight, real-time log streaming tool for Linux servers built with AI.
 
 ## About
 
-Loged is an open-source, minimal log viewer that runs entirely on your server without requiring external backends or databases. It provides a web-based interface for monitoring log files in real-time, similar to `tail -f` but accessible from any browser.
+Loged is an open-source, minimal log viewer that runs entirely on your server without requiring external backends or databases. It provides a web-based interface for monitoring log files in real-time, accessible from any browser.
 
 ### Features
 - **Real-time log streaming** via WebSocket connections
@@ -14,7 +14,7 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 - **No external dependencies** - no databases or centralized services required
 - **Server-side only** - runs where your logs are located
 - **Auto-scroll** - new log entries appear automatically
-- **Modern UI** - clean, responsive interface with dark theme
+- **Modern UI** - clean, responsive interface with animated gradients and glass morphism effects
 - **Configuration-driven** - manage log files via config.yml
 - **Background service** - runs as daemon, doesn't occupy terminal
 - **Basic authentication** - secure access with username/password
@@ -40,7 +40,7 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 ### One-Command Installation (Linux/macOS/WSL)
 
 ```bash
-git clone <repo-url> && cd loged && chmod +x loged && ./loged
+git clone https://github.com/rutwikdeshmukh/loged && cd loged && chmod +x loged && ./loged install
 ```
 
 This will automatically:
@@ -55,7 +55,7 @@ This will automatically:
 1. **Install Go 1.21+** from https://golang.org/dl/
 2. **Clone and setup:**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/rutwikdeshmukh/loged
    cd loged
    chmod +x loged
    ./loged install
@@ -66,7 +66,7 @@ This will automatically:
 1. **Install Go** from https://golang.org/dl/ (download the .msi installer)
 2. **Clone and build:**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/rutwikdeshmukh/loged
    cd loged
    go mod tidy
    go build -o runtime/loged-server.exe src/main.go
@@ -121,15 +121,15 @@ log_files:
    ./loged start
    ```
 
-2. **Open your browser to:** `http://localhost:8008`
+2. **Open your browser to:** `http://<your-server-ip>:8008`
 
 #### Via Nginx Reverse Proxy (Linux)
 1. **Add to /etc/hosts:**
    ```
-   127.0.0.1 loged.logs
+   <your-server-ip> <your-domain.com>
    ```
 
-2. **Access via:** `http://loged.logs/loged`
+2. **Access via:** `http://<your-domain.com>/loged`
 
 ### Using the Interface
 
@@ -153,14 +153,14 @@ Bookmark or share direct links to specific log files:
 
 **Direct access:**
 ```
-http://localhost:8008?file=/var/log/syslog
-http://localhost:8008?file=/var/log/nginx/access.log
+http://<your-server-ip>:8008?file=/var/log/syslog
+http://<your-server-ip>:8008?file=/var/log/nginx/access.log
 ```
 
 **Via nginx proxy:**
 ```
-http://loged.logs/loged?file=/var/log/syslog
-http://loged.logs/loged?file=/var/log/nginx/access.log
+http://<your-domain.com>/loged?file=/var/log/syslog
+http://<your-domain.com>/loged?file=/var/log/nginx/access.log
 ```
 
 ### Command Line Options
@@ -168,6 +168,8 @@ http://loged.logs/loged?file=/var/log/nginx/access.log
 ```bash
 ./runtime/loged-server -port 8080    # Override config port (manual run)
 ```
+
+The server will be accessible at `http://<your-server-ip>:8080` when run manually.
 
 ## Production Deployment
 
@@ -184,12 +186,12 @@ The nginx configuration is ready for SSL. Add your certificates:
 ```nginx
 server {
     listen 443 ssl;
-    server_name loged.logs;
+    server_name <your-domain.com>;
     
     ssl_certificate /path/to/your/certificate.crt;
     ssl_certificate_key /path/to/your/private.key;
     
-    location /loaded {
+    location /loged {
         # existing proxy configuration
     }
 }
