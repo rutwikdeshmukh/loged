@@ -253,14 +253,14 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Catlog - Login</title>
+<title>catlog - Login</title>
 <link rel="icon" type="image/png" href="/catlog.png">
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #090300;
-    color: #D6D5D4;
+    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    background: #000000;
+    color: #00FF00;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -269,20 +269,20 @@ body {
     justify-content: center;
 }
 .login-container {
-    background: #3A3432;
+    background: #1A1A1A;
     padding: 40px;
-    border-radius: 12px;
-    border: 1px solid #807D7C;
+    border-radius: 4px;
+    border: 1px solid #333333;
     width: 100%%;
     max-width: 400px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    box-shadow: 0 0 20px rgba(0,255,0,0.1);
 }
 h1 {
-    color: #01A0E4;
+    color: #00FF00;
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
-    font-weight: 600;
+    font-weight: 400;
 }
 .form-group {
     margin-bottom: 20px;
@@ -290,53 +290,57 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #01A252;
-    font-weight: 500;
+    color: #FFFF00;
+    font-weight: 400;
 }
 input[type="text"], input[type="password"] {
     width: 100%%;
     padding: 12px 16px;
-    background: #4A4543;
-    border: 1px solid #807D7C;
-    border-radius: 6px;
-    color: #D6D5D4;
+    background: #000000;
+    border: 1px solid #333333;
+    border-radius: 2px;
+    color: #00FF00;
     font-size: 16px;
+    font-family: 'Source Code Pro', monospace;
     transition: border-color 0.2s;
 }
 input[type="text"]:focus, input[type="password"]:focus {
     outline: none;
-    border-color: #01A252;
+    border-color: #00FF00;
+    box-shadow: 0 0 5px rgba(0,255,0,0.3);
 }
 .login-btn {
     width: 100%%;
     padding: 12px;
-    background: #01A252;
-    color: #090300;
-    border: none;
-    border-radius: 6px;
+    background: #333333;
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    border-radius: 2px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .login-btn:hover {
-    background: #B5E4F4;
-    transform: translateY(-1px);
+    background: #00FF00;
+    color: #000000;
 }
 .error {
-    background: #DB2D20;
-    color: #F7F7F7;
+    background: #FF0000;
+    color: #FFFFFF;
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 2px;
     margin-bottom: 20px;
     text-align: center;
+    font-family: 'Source Code Pro', monospace;
 }
 </style>
 </head>
 <body>
 <div class="login-container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="Catlog" style="height: 80px; width: auto;">
+        <img src="/catlog.png" alt="catlog" style="height: 80px; width: auto;">
     </div>
     <h1>catlog</h1>
     <form method="POST">
@@ -391,14 +395,14 @@ input[type="text"]:focus, input[type="password"]:focus {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Catlog - Login</title>
+<title>catlog - Login</title>
 <link rel="icon" type="image/png" href="/catlog.png">
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #090300;
-    color: #D6D5D4;
+    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    background: #000000;
+    color: #00FF00;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -407,20 +411,20 @@ body {
     justify-content: center;
 }
 .login-container {
-    background: #3A3432;
+    background: #1A1A1A;
     padding: 40px;
-    border-radius: 12px;
-    border: 1px solid #807D7C;
+    border-radius: 4px;
+    border: 1px solid #333333;
     width: 100%%;
     max-width: 400px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    box-shadow: 0 0 20px rgba(0,255,0,0.1);
 }
 h1 {
-    color: #01A0E4;
+    color: #00FF00;
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
-    font-weight: 600;
+    font-weight: 400;
 }
 .form-group {
     margin-bottom: 20px;
@@ -428,53 +432,57 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #01A252;
-    font-weight: 500;
+    color: #FFFF00;
+    font-weight: 400;
 }
 input[type="text"], input[type="password"] {
     width: 100%%;
     padding: 12px 16px;
-    background: #4A4543;
-    border: 1px solid #807D7C;
-    border-radius: 6px;
-    color: #D6D5D4;
+    background: #000000;
+    border: 1px solid #333333;
+    border-radius: 2px;
+    color: #00FF00;
     font-size: 16px;
+    font-family: 'Source Code Pro', monospace;
     transition: border-color 0.2s;
 }
 input[type="text"]:focus, input[type="password"]:focus {
     outline: none;
-    border-color: #01A252;
+    border-color: #00FF00;
+    box-shadow: 0 0 5px rgba(0,255,0,0.3);
 }
 .login-btn {
     width: 100%%;
     padding: 12px;
-    background: #01A252;
-    color: #090300;
-    border: none;
-    border-radius: 6px;
+    background: #333333;
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    border-radius: 2px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .login-btn:hover {
-    background: #B5E4F4;
-    transform: translateY(-1px);
+    background: #00FF00;
+    color: #000000;
 }
 .error {
-    background: #DB2D20;
-    color: #F7F7F7;
+    background: #FF0000;
+    color: #FFFFFF;
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 2px;
     margin-bottom: 20px;
     text-align: center;
+    font-family: 'Source Code Pro', monospace;
 }
 </style>
 </head>
 <body>
 <div class="login-container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="Catlog" style="height: 80px; width: auto;">
+        <img src="/catlog.png" alt="catlog" style="height: 80px; width: auto;">
     </div>
     <h1>catlog</h1>
     <div class="error">Invalid username or password</div>
@@ -636,10 +644,10 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace; 
     margin: 0; padding: 0; 
-    background: #090300;
-    color: #D6D5D4; 
+    background: #000000;
+    color: #00FF00; 
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -651,55 +659,57 @@ body {
     text-align: center;
 }
 h1 { 
-    color: #01A0E4; 
+    color: #00FF00; 
     font-size: 48px; 
-    font-weight: 700;
+    font-weight: 400;
     margin-bottom: 20px;
 }
 .subtitle {
-    color: #A5A2A2;
+    color: #CCCCCC;
     font-size: 18px;
     margin-bottom: 40px;
     line-height: 1.6;
 }
 .ssl-warning {
-    background: #3A3432;
+    background: #1A1A1A;
     padding: 25px;
-    border-radius: 8px;
-    border-left: 4px solid #CDAB53;
+    border-radius: 4px;
+    border-left: 4px solid #FFFF00;
     margin-bottom: 30px;
     text-align: left;
 }
 .ssl-warning h3 {
-    color: #CDAB53;
+    color: #FFFF00;
     margin-top: 0;
     font-size: 20px;
 }
 .ssl-warning p {
-    color: #D6D5D4;
+    color: #CCCCCC;
     margin: 10px 0;
     line-height: 1.5;
 }
 .proceed-btn {
-    background: #01A252;
-    color: #090300;
-    border: none;
+    background: #333333;
+    color: #00FF00;
+    border: 1px solid #00FF00;
     padding: 15px 30px;
-    border-radius: 8px;
+    border-radius: 4px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 .proceed-btn:hover {
-    background: #B5E4F4;
+    background: #00FF00;
+    color: #000000;
 }
 </style>
 </head>
 <body>
 <div class="container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="Catlog" style="height: 80px; width: auto;">
+        <img src="/catlog.png" alt="catlog" style="height: 80px; width: auto;">
     </div>
     <h1>catlog</h1>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
@@ -749,10 +759,10 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace; 
     margin: 0; padding: 0; 
-    background: #090300;
-    color: #D6D5D4; 
+    background: #000000;
+    color: #00FF00; 
     min-height: 100vh;
 }
 .container { 
@@ -767,65 +777,66 @@ body {
     margin-bottom: 40px;
 }
 h1 { 
-    color: #01A0E4; 
+    color: #00FF00; 
     margin: 0; 
     font-size: 32px; 
-    font-weight: 600;
+    font-weight: 400;
 }
 .logout-btn {
-    background: #DB2D20;
-    color: #F7F7F7;
+    background: #FF0000;
+    color: #FFFFFF;
     border: none;
     padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: 2px;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .logout-btn:hover {
-    background: #E8BBD0;
-    transform: translateY(-1px);
+    background: #FFFFFF;
+    color: #FF0000;
 }
 .section { 
-    background: #3A3432;
+    background: #1A1A1A;
     margin: 25px 0; 
     padding: 25px; 
-    border-radius: 8px; 
-    border: 1px solid #807D7C;
+    border-radius: 4px; 
+    border: 1px solid #333333;
 }
 .section h3 { 
-    color: #01A252; 
+    color: #FFFF00; 
     margin-top: 0; 
     font-size: 20px; 
-    font-weight: 500;
+    font-weight: 400;
     margin-bottom: 20px;
 }
 .log-item { 
     margin: 15px 0; 
     padding: 15px; 
-    background: #4A4543;
-    border-radius: 6px; 
-    border-left: 4px solid #01A252;
+    background: #000000;
+    border-radius: 2px; 
+    border-left: 4px solid #00FF00;
     transition: border-color 0.2s ease;
 }
 .log-item:hover { 
-    border-left-color: #B5E4F4;
+    border-left-color: #FFFF00;
 }
 .log-item a { 
-    color: #D6D5D4; 
+    color: #00FF00; 
     text-decoration: none; 
-    font-weight: 500; 
+    font-weight: 400; 
     font-size: 16px;
     display: block;
     margin-bottom: 5px;
 }
 .log-item a:hover { 
-    color: #B5E4F4;
+    color: #FFFF00;
 }
 .log-item small { 
-    color: #A5A2A2; 
+    color: #CCCCCC; 
     font-size: 13px; 
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-family: 'Source Code Pro', monospace;
 }
 .custom-form { 
     display: flex; 
@@ -837,33 +848,36 @@ h1 {
     padding: 12px 15px; 
     flex: 1; 
     min-width: 300px; 
-    background: #4A4543; 
-    border: 1px solid #807D7C; 
-    border-radius: 6px; 
-    color: #D6D5D4; 
+    background: #000000; 
+    border: 1px solid #333333; 
+    border-radius: 2px; 
+    color: #00FF00; 
     font-size: 14px;
+    font-family: 'Source Code Pro', monospace;
 }
 .custom-form input:focus { 
     outline: none; 
-    border-color: #01A0E4; 
-    box-shadow: 0 0 0 2px rgba(1,160,228,0.2);
+    border-color: #00FF00; 
+    box-shadow: 0 0 5px rgba(0,255,0,0.3);
 }
 .custom-form button { 
     padding: 12px 20px; 
-    background: #01A0E4; 
-    color: #090300; 
-    border: none; 
-    border-radius: 6px; 
+    background: #333333; 
+    color: #00FF00; 
+    border: 1px solid #00FF00; 
+    border-radius: 2px; 
     cursor: pointer; 
-    font-weight: 500;
-    transition: background 0.2s;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
+    transition: all 0.2s;
 }
 .custom-form button:hover { 
-    background: #B5E4F4;
+    background: #00FF00;
+    color: #000000;
 }
 .empty-state { 
     text-align: center; 
-    color: #A5A2A2; 
+    color: #CCCCCC; 
     font-style: italic; 
     padding: 20px;
 }
@@ -873,8 +887,8 @@ h1 {
 <div class="container">
 <div class="header-main">
 <div style="display: flex; align-items: center; gap: 15px;">
-<img src="/catlog.png" alt="Catlog" style="height: 40px; width: auto;">
-<h1>Catlog - Real-time Log Viewer</h1>
+<img src="/catlog.png" alt="catlog" style="height: 40px; width: auto;">
+<h1>catlog - Real-time Log Viewer</h1>
 </div>
 <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
@@ -938,21 +952,21 @@ function logout() {
 <!DOCTYPE html>
 <html>
 <head>
-<title>%s - Catlog</title>
+<title>%s - catlog</title>
 <link rel="icon" type="image/png" href="/catlog.png">
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace; 
     margin: 0; padding: 0; 
-    background: #090300;
-    color: #D6D5D4; 
+    background: #000000;
+    color: #00FF00; 
     height: 100vh;
 }
 .header { 
-    background: #3A3432;
+    background: #1A1A1A;
     padding: 20px 25px; 
-    border-bottom: 1px solid #807D7C;
+    border-bottom: 1px solid #333333;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -963,48 +977,50 @@ body {
     gap: 15px;
 }
 .back-link { 
-    color: #090300;
-    background: #01A252;
+    color: #000000;
+    background: #00FF00;
     text-decoration: none; 
     padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: 2px;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
     transition: all 0.2s;
 }
 .back-link:hover { 
-    background: #B5E4F4;
-    transform: translateY(-1px);
+    background: #FFFF00;
+    color: #000000;
 }
 .logout-btn {
-    background: #DB2D20;
-    color: #F7F7F7;
+    background: #FF0000;
+    color: #FFFFFF;
     border: none;
     padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: 2px;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .logout-btn:hover {
-    background: #E8BBD0;
-    transform: translateY(-1px);
+    background: #FFFFFF;
+    color: #FF0000;
 }
 h1 { 
-    color: #01A0E4; 
+    color: #00FF00; 
     margin: 0; 
     display: inline-block; 
     font-size: 24px;
-    font-weight: 600;
+    font-weight: 400;
 }
 #status { 
-    color: #A5A2A2; 
+    color: #CCCCCC; 
     margin: 10px 0 0 0; 
     font-size: 14px;
     padding: 8px 12px;
-    background: #4A4543;
-    border-radius: 4px;
+    background: #000000;
+    border-radius: 2px;
     display: inline-block;
-    border: 1px solid #807D7C;
+    border: 1px solid #333333;
 }
 .container { 
     padding: 20px; 
@@ -1018,69 +1034,72 @@ h1 {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #3A3432;
-    border-radius: 6px;
-    border: 1px solid #807D7C;
+    background: #1A1A1A;
+    border-radius: 2px;
+    border: 1px solid #333333;
 }
 #loadMoreBtn {
-    background: #A16A94;
-    color: #F7F7F7;
-    border: none;
+    background: #333333;
+    color: #00FF00;
+    border: 1px solid #00FF00;
     padding: 10px 16px;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
+    font-weight: 400;
+    font-family: 'Source Code Pro', monospace;
+    transition: all 0.2s;
 }
 #loadMoreBtn:hover { 
-    background: #E8BBD0;
+    background: #00FF00;
+    color: #000000;
 }
 #loadMoreBtn:disabled { 
-    background: #5C5855;
+    background: #666666;
     cursor: not-allowed;
-    color: #A5A2A2;
+    color: #CCCCCC;
+    border-color: #666666;
 }
 .log-info {
-    color: #A5A2A2;
+    color: #CCCCCC;
     font-size: 14px;
 }
 #logs { 
-    background: #4A4543;
+    background: #000000;
     padding: 15px; 
     flex: 1; 
     overflow-y: auto; 
-    border: 1px solid #807D7C; 
-    border-radius: 6px;
+    border: 1px solid #333333; 
+    border-radius: 2px;
     font-size: 13px;
     line-height: 1.5;
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-family: 'Source Code Pro', monospace;
 }
 .log-line { 
     margin: 2px 0; 
     padding: 4px 8px;
-    border-radius: 3px;
+    border-radius: 2px;
     transition: background 0.2s;
 }
 .log-line:hover {
-    background: #3A3432;
+    background: #1A1A1A;
 }
 .log-line.new {
-    background: rgba(1,162,82,0.2);
+    background: rgba(0,255,0,0.1);
     animation: fadeOut 2s ease-out forwards;
 }
 @keyframes fadeOut {
-    0%% { background: rgba(1,162,82,0.2); }
+    0%% { background: rgba(0,255,0,0.1); }
     100%% { background: transparent; }
 }
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #3A3432; }
+::-webkit-scrollbar-track { background: #1A1A1A; }
 ::-webkit-scrollbar-thumb { 
-    background: #807D7C; 
-    border-radius: 4px;
+    background: #333333; 
+    border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover { 
-    background: #A5A2A2;
+    background: #666666;
 }
 </style>
 </head>
@@ -1088,7 +1107,7 @@ h1 {
 <div class="header">
     <div style="display: flex; align-items: center; gap: 15px;">
         <a href="%s" class="back-link">Back to Log List</a>
-        <img src="/catlog.png" alt="Catlog" style="height: 32px; width: auto;">
+        <img src="/catlog.png" alt="catlog" style="height: 32px; width: auto;">
         <h1>%s</h1>
     </div>
     <div class="header-right">
@@ -1149,7 +1168,7 @@ ws.onmessage = function(event) {
     
     // Highlight error keywords
     let content = data;
-    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #DB2D20; font-weight: bold;">$1</span>');
+    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #FF0000; font-weight: bold;">$1</span>');
     line.innerHTML = content;
     
     // If it's a new real-time log (not from load more)
@@ -1162,7 +1181,7 @@ ws.onmessage = function(event) {
     } else {
         // Historical line from load more
         const originalContent = data.substring('__HISTORICAL__:'.length);
-        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #DB2D20; font-weight: bold;">$1</span>');
+        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #FF0000; font-weight: bold;">$1</span>');
         line.innerHTML = highlightedContent;
         line.classList.remove('new');
         logs.insertBefore(line, logs.firstChild);
@@ -1204,7 +1223,7 @@ function loadMore() {
                 const line = document.createElement('div');
                 line.className = 'log-line';
                 // Highlight error keywords
-                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #DB2D20; font-weight: bold;">$1</span>');
+                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #FF0000; font-weight: bold;">$1</span>');
                 line.innerHTML = highlightedText;
                 logs.insertBefore(line, logs.firstChild);
             });
