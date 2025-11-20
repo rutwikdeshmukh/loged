@@ -258,9 +258,9 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    background: #000000;
-    color: #00FF00;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
+    background: #1e1e1e;
+    color: #e0e0e0;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -269,20 +269,20 @@ body {
     justify-content: center;
 }
 .login-container {
-    background: #1A1A1A;
+    background: #252526;
     padding: 40px;
-    border-radius: 4px;
-    border: 1px solid #333333;
+    border-radius: 6px;
+    border: 1px solid #3e3e42;
     width: 100%%;
     max-width: 400px;
-    box-shadow: 0 0 20px rgba(0,255,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 h1 {
-    color: #00FF00;
+    color: #e0e0e0;
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
-    font-weight: 400;
+    font-weight: 500;
 }
 .form-group {
     margin-bottom: 20px;
@@ -290,50 +290,51 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #FFFF00;
-    font-weight: 400;
+    color: #e0e0e0;
+    font-weight: 500;
+    font-size: 14px;
 }
 input[type="text"], input[type="password"] {
     width: 100%%;
     padding: 12px 16px;
-    background: #000000;
-    border: 1px solid #333333;
-    border-radius: 2px;
-    color: #00FF00;
-    font-size: 16px;
-    font-family: 'Source Code Pro', monospace;
+    background: #1e1e1e;
+    border: 1px solid #3e3e42;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     transition: border-color 0.2s;
 }
 input[type="text"]:focus, input[type="password"]:focus {
     outline: none;
-    border-color: #00FF00;
-    box-shadow: 0 0 5px rgba(0,255,0,0.3);
+    border-color: #007acc;
+    box-shadow: 0 0 0 2px rgba(0,122,204,0.2);
 }
 .login-btn {
     width: 100%%;
     padding: 12px;
-    background: #333333;
-    color: #00FF00;
-    border: 1px solid #00FF00;
-    border-radius: 2px;
-    font-size: 16px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    background: #007acc;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .login-btn:hover {
-    background: #00FF00;
-    color: #000000;
+    background: #1177bb;
 }
 .error {
-    background: #FF0000;
-    color: #FFFFFF;
+    background: #f48771;
+    color: #1e1e1e;
     padding: 12px;
-    border-radius: 2px;
+    border-radius: 4px;
     margin-bottom: 20px;
     text-align: center;
-    font-family: 'Source Code Pro', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
+    font-weight: 500;
 }
 </style>
 </head>
@@ -400,9 +401,9 @@ input[type="text"]:focus, input[type="password"]:focus {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    background: #000000;
-    color: #00FF00;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
+    background: #1e1e1e;
+    color: #e0e0e0;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -411,20 +412,20 @@ body {
     justify-content: center;
 }
 .login-container {
-    background: #1A1A1A;
+    background: #252526;
     padding: 40px;
-    border-radius: 4px;
-    border: 1px solid #333333;
+    border-radius: 6px;
+    border: 1px solid #3e3e42;
     width: 100%%;
     max-width: 400px;
-    box-shadow: 0 0 20px rgba(0,255,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 h1 {
-    color: #00FF00;
+    color: #e0e0e0;
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
-    font-weight: 400;
+    font-weight: 500;
 }
 .form-group {
     margin-bottom: 20px;
@@ -432,50 +433,51 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #FFFF00;
-    font-weight: 400;
+    color: #e0e0e0;
+    font-weight: 500;
+    font-size: 14px;
 }
 input[type="text"], input[type="password"] {
     width: 100%%;
     padding: 12px 16px;
-    background: #000000;
-    border: 1px solid #333333;
-    border-radius: 2px;
-    color: #00FF00;
-    font-size: 16px;
-    font-family: 'Source Code Pro', monospace;
+    background: #1e1e1e;
+    border: 1px solid #3e3e42;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     transition: border-color 0.2s;
 }
 input[type="text"]:focus, input[type="password"]:focus {
     outline: none;
-    border-color: #00FF00;
-    box-shadow: 0 0 5px rgba(0,255,0,0.3);
+    border-color: #007acc;
+    box-shadow: 0 0 0 2px rgba(0,122,204,0.2);
 }
 .login-btn {
     width: 100%%;
     padding: 12px;
-    background: #333333;
-    color: #00FF00;
-    border: 1px solid #00FF00;
-    border-radius: 2px;
-    font-size: 16px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    background: #007acc;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .login-btn:hover {
-    background: #00FF00;
-    color: #000000;
+    background: #1177bb;
 }
 .error {
-    background: #FF0000;
-    color: #FFFFFF;
+    background: #f48771;
+    color: #1e1e1e;
     padding: 12px;
-    border-radius: 2px;
+    border-radius: 4px;
     margin-bottom: 20px;
     text-align: center;
-    font-family: 'Source Code Pro', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
+    font-weight: 500;
 }
 </style>
 </head>
@@ -644,10 +646,10 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace; 
     margin: 0; padding: 0; 
-    background: #000000;
-    color: #00FF00; 
+    background: #1e1e1e;
+    color: #e0e0e0; 
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -659,50 +661,49 @@ body {
     text-align: center;
 }
 h1 { 
-    color: #00FF00; 
+    color: #e0e0e0; 
     font-size: 48px; 
-    font-weight: 400;
+    font-weight: 500;
     margin-bottom: 20px;
 }
 .subtitle {
-    color: #CCCCCC;
+    color: #a0a0a0;
     font-size: 18px;
     margin-bottom: 40px;
     line-height: 1.6;
 }
 .ssl-warning {
-    background: #1A1A1A;
+    background: #252526;
     padding: 25px;
-    border-radius: 4px;
-    border-left: 4px solid #FFFF00;
+    border-radius: 6px;
+    border-left: 4px solid #007acc;
     margin-bottom: 30px;
     text-align: left;
 }
 .ssl-warning h3 {
-    color: #FFFF00;
+    color: #007acc;
     margin-top: 0;
     font-size: 20px;
 }
 .ssl-warning p {
-    color: #CCCCCC;
+    color: #a0a0a0;
     margin: 10px 0;
     line-height: 1.5;
 }
 .proceed-btn {
-    background: #333333;
-    color: #00FF00;
-    border: 1px solid #00FF00;
+    background: #007acc;
+    color: #ffffff;
+    border: none;
     padding: 15px 30px;
-    border-radius: 4px;
-    font-size: 18px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .proceed-btn:hover {
-    background: #00FF00;
-    color: #000000;
+    background: #1177bb;
 }
 </style>
 </head>
@@ -759,10 +760,10 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace; 
     margin: 0; padding: 0; 
-    background: #000000;
-    color: #00FF00; 
+    background: #1e1e1e;
+    color: #e0e0e0; 
     min-height: 100vh;
 }
 .container { 
@@ -777,66 +778,65 @@ body {
     margin-bottom: 40px;
 }
 h1 { 
-    color: #00FF00; 
+    color: #e0e0e0; 
     margin: 0; 
     font-size: 32px; 
-    font-weight: 400;
+    font-weight: 500;
 }
 .logout-btn {
-    background: #FF0000;
-    color: #FFFFFF;
+    background: #f48771;
+    color: #ffffff;
     border: none;
     padding: 8px 16px;
-    border-radius: 2px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .logout-btn:hover {
-    background: #FFFFFF;
-    color: #FF0000;
+    background: #ff6b6b;
 }
 .section { 
-    background: #1A1A1A;
+    background: #252526;
     margin: 25px 0; 
     padding: 25px; 
-    border-radius: 4px; 
-    border: 1px solid #333333;
+    border-radius: 6px; 
+    border: 1px solid #3e3e42;
 }
 .section h3 { 
-    color: #FFFF00; 
+    color: #007acc; 
     margin-top: 0; 
-    font-size: 20px; 
-    font-weight: 400;
+    font-size: 18px; 
+    font-weight: 500;
     margin-bottom: 20px;
 }
 .log-item { 
     margin: 15px 0; 
     padding: 15px; 
-    background: #000000;
-    border-radius: 2px; 
-    border-left: 4px solid #00FF00;
+    background: #1e1e1e;
+    border-radius: 4px; 
+    border-left: 4px solid #007acc;
     transition: border-color 0.2s ease;
 }
 .log-item:hover { 
-    border-left-color: #FFFF00;
+    border-left-color: #4ec9b0;
 }
 .log-item a { 
-    color: #00FF00; 
+    color: #007acc; 
     text-decoration: none; 
-    font-weight: 400; 
-    font-size: 16px;
+    font-weight: 500; 
+    font-size: 15px;
     display: block;
     margin-bottom: 5px;
 }
 .log-item a:hover { 
-    color: #FFFF00;
+    color: #4ec9b0;
 }
 .log-item small { 
-    color: #CCCCCC; 
+    color: #a0a0a0; 
     font-size: 13px; 
-    font-family: 'Source Code Pro', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
 }
 .custom-form { 
     display: flex; 
@@ -848,36 +848,35 @@ h1 {
     padding: 12px 15px; 
     flex: 1; 
     min-width: 300px; 
-    background: #000000; 
-    border: 1px solid #333333; 
-    border-radius: 2px; 
-    color: #00FF00; 
+    background: #1e1e1e; 
+    border: 1px solid #3e3e42; 
+    border-radius: 4px; 
+    color: #e0e0e0; 
     font-size: 14px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
 }
 .custom-form input:focus { 
     outline: none; 
-    border-color: #00FF00; 
-    box-shadow: 0 0 5px rgba(0,255,0,0.3);
+    border-color: #007acc; 
+    box-shadow: 0 0 0 2px rgba(0,122,204,0.2);
 }
 .custom-form button { 
     padding: 12px 20px; 
-    background: #333333; 
-    color: #00FF00; 
-    border: 1px solid #00FF00; 
-    border-radius: 2px; 
+    background: #007acc; 
+    color: #ffffff; 
+    border: none; 
+    border-radius: 4px; 
     cursor: pointer; 
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     transition: all 0.2s;
 }
 .custom-form button:hover { 
-    background: #00FF00;
-    color: #000000;
+    background: #1177bb;
 }
 .empty-state { 
     text-align: center; 
-    color: #CCCCCC; 
+    color: #a0a0a0; 
     font-style: italic; 
     padding: 20px;
 }
@@ -957,16 +956,16 @@ function logout() {
 <style>
 * { box-sizing: border-box; }
 body { 
-    font-family: 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', monospace; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace; 
     margin: 0; padding: 0; 
-    background: #000000;
-    color: #00FF00; 
+    background: #1e1e1e;
+    color: #e0e0e0; 
     height: 100vh;
 }
 .header { 
-    background: #1A1A1A;
+    background: #252526;
     padding: 20px 25px; 
-    border-bottom: 1px solid #333333;
+    border-bottom: 1px solid #3e3e42;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -977,50 +976,48 @@ body {
     gap: 15px;
 }
 .back-link { 
-    color: #000000;
-    background: #00FF00;
+    color: #1e1e1e;
+    background: #007acc;
     text-decoration: none; 
     padding: 8px 16px;
-    border-radius: 2px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     transition: all 0.2s;
 }
 .back-link:hover { 
-    background: #FFFF00;
-    color: #000000;
+    background: #1177bb;
 }
 .logout-btn {
-    background: #FF0000;
-    color: #FFFFFF;
+    background: #f48771;
+    color: #ffffff;
     border: none;
     padding: 8px 16px;
-    border-radius: 2px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     cursor: pointer;
     transition: all 0.2s;
 }
 .logout-btn:hover {
-    background: #FFFFFF;
-    color: #FF0000;
+    background: #ff6b6b;
 }
 h1 { 
-    color: #00FF00; 
+    color: #e0e0e0; 
     margin: 0; 
     display: inline-block; 
     font-size: 24px;
-    font-weight: 400;
+    font-weight: 500;
 }
 #status { 
-    color: #CCCCCC; 
+    color: #a0a0a0; 
     margin: 10px 0 0 0; 
-    font-size: 14px;
+    font-size: 13px;
     padding: 8px 12px;
-    background: #000000;
-    border-radius: 2px;
+    background: #1e1e1e;
+    border-radius: 4px;
     display: inline-block;
-    border: 1px solid #333333;
+    border: 1px solid #3e3e42;
 }
 .container { 
     padding: 20px; 
@@ -1034,46 +1031,45 @@ h1 {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #1A1A1A;
-    border-radius: 2px;
-    border: 1px solid #333333;
+    background: #252526;
+    border-radius: 4px;
+    border: 1px solid #3e3e42;
 }
 #loadMoreBtn {
-    background: #333333;
-    color: #00FF00;
-    border: 1px solid #00FF00;
+    background: #007acc;
+    color: #ffffff;
+    border: none;
     padding: 10px 16px;
-    border-radius: 2px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 400;
-    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
     transition: all 0.2s;
 }
 #loadMoreBtn:hover { 
-    background: #00FF00;
-    color: #000000;
+    background: #1177bb;
 }
 #loadMoreBtn:disabled { 
     background: #666666;
     cursor: not-allowed;
-    color: #CCCCCC;
+    color: #a0a0a0;
     border-color: #666666;
 }
 .log-info {
-    color: #CCCCCC;
-    font-size: 14px;
+    color: #a0a0a0;
+    font-size: 13px;
 }
 #logs { 
-    background: #000000;
+    background: #1e1e1e;
     padding: 15px; 
     flex: 1; 
     overflow-y: auto; 
-    border: 1px solid #333333; 
-    border-radius: 2px;
+    border: 1px solid #3e3e42; 
+    border-radius: 4px;
     font-size: 13px;
     line-height: 1.5;
-    font-family: 'Source Code Pro', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto Mono', monospace;
 }
 .log-line { 
     margin: 2px 0; 
@@ -1082,24 +1078,24 @@ h1 {
     transition: background 0.2s;
 }
 .log-line:hover {
-    background: #1A1A1A;
+    background: #252526;
 }
 .log-line.new {
-    background: rgba(0,255,0,0.1);
+    background: rgba(78,201,176,0.1);
     animation: fadeOut 2s ease-out forwards;
 }
 @keyframes fadeOut {
-    0%% { background: rgba(0,255,0,0.1); }
+    0%% { background: rgba(78,201,176,0.1); }
     100%% { background: transparent; }
 }
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #1A1A1A; }
+::-webkit-scrollbar-track { background: #252526; }
 ::-webkit-scrollbar-thumb { 
-    background: #333333; 
-    border-radius: 2px;
+    background: #3e3e42; 
+    border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover { 
-    background: #666666;
+    background: #555555;
 }
 </style>
 </head>
@@ -1141,7 +1137,7 @@ let allLines = [];
 ws.onopen = function() {
     console.log('WebSocket connected');
     status.textContent = 'Connected - Monitoring log file';
-    status.style.color = '#01A0E4';
+    status.style.color = '#4ec9b0';
 };
 
 ws.onmessage = function(event) {
@@ -1168,7 +1164,7 @@ ws.onmessage = function(event) {
     
     // Highlight error keywords
     let content = data;
-    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #FF0000; font-weight: bold;">$1</span>');
+    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #f48771; font-weight: bold;">$1</span>');
     line.innerHTML = content;
     
     // If it's a new real-time log (not from load more)
@@ -1181,7 +1177,7 @@ ws.onmessage = function(event) {
     } else {
         // Historical line from load more
         const originalContent = data.substring('__HISTORICAL__:'.length);
-        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #FF0000; font-weight: bold;">$1</span>');
+        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #f48771; font-weight: bold;">$1</span>');
         line.innerHTML = highlightedContent;
         line.classList.remove('new');
         logs.insertBefore(line, logs.firstChild);
@@ -1196,13 +1192,13 @@ ws.onmessage = function(event) {
 ws.onclose = function() {
     console.log('WebSocket closed');
     status.textContent = 'Connection closed';
-    status.style.color = '#DB2D20';
+    status.style.color = '#f48771';
 };
 
 ws.onerror = function(error) {
     console.error('WebSocket error:', error);
     status.textContent = 'Connection error';
-    status.style.color = '#DB2D20';
+    status.style.color = '#f48771';
 };
 
 function loadMore() {
@@ -1223,7 +1219,7 @@ function loadMore() {
                 const line = document.createElement('div');
                 line.className = 'log-line';
                 // Highlight error keywords
-                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #FF0000; font-weight: bold;">$1</span>');
+                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #f48771; font-weight: bold;">$1</span>');
                 line.innerHTML = highlightedText;
                 logs.insertBefore(line, logs.firstChild);
             });
