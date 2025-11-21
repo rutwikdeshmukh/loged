@@ -1,9 +1,10 @@
 # Configuration file for the log monitoring application
 port: 8008
+base_url: ""  # Leave empty for localhost:port, or set to "/catlog" for nginx reverse proxy
 server_ip: "127.0.0.1"  # Auto-updated by restart command
 timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
-  enabled: true
+  enabled: false  # Set to true when using nginx with SSL
   cert_path: "/etc/ssl/certs/catlog.crt"
   key_path: "/etc/ssl/private/catlog.key"
 auth:
