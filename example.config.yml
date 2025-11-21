@@ -30,14 +30,11 @@ auth:
       password: "devops123"
       role: "devops"
       allowed_paths:
-        - "/var/log/syslog"
         - "/var/log/auth.log"
         - "/var/log/nginx/*"
 log_files:
   - name: "Sample Log"
     path: "src/sample.log"
-  - name: "System Log"
-    path: "/var/log/syslog"
   - name: "Nginx Access Log"
     path: "/var/log/nginx/catlog_access.log"
   - name: "Nginx SSL Access Log"
