@@ -19,7 +19,7 @@ auth:
       allowed_paths:
         - "/var/log/supervisor/*"
         - "/var/log/app/*"
-        - "./runtime/catlog.log"
+        - "runtime/catlog.log"
     - username: "FEDeveloper"
       password: "frontend123"
       role: "frontend"
@@ -35,7 +35,7 @@ auth:
         - "/var/log/nginx/*"
 log_files:
   - name: "Sample Log"
-    path: "./src/sample.log"
+    path: "src/sample.log"
   - name: "System Log"
     path: "/var/log/syslog"
   - name: "Nginx Access Log"
@@ -45,4 +45,4 @@ log_files:
   - name: "Nginx Error Log"
     path: "/var/log/nginx/error.log"
   - name: "Catlog Log"
-    path: "./runtime/catlog.log"
+    path: "runtime/catlog.log"
